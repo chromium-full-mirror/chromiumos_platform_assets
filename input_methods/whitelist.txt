@@ -19,7 +19,7 @@
 # keyboard_overlay_id.
 
 # Dutch
-xkb:nl::nld           nl            # Netherlands - Dutch
+# xkb:nl::nld           nl            # Netherlands - Dutch
 xkb:be::nld           nl            # Belgium - Dutch
 
 # French
