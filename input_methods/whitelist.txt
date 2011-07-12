@@ -18,6 +18,13 @@
 # Each list item defines the correspondence between input_method_id and
 # keyboard_overlay_id.
 
+# U.S. English
+xkb:us::eng           en_US         # US - English
+xkb:us:intl:eng       en_US_intl    # US - International - English
+xkb:us:altgr-intl:eng en_US_altgr_intl  # US - Extended (AltGr) - English
+xkb:us:dvorak:eng     en_US_dvorak  # US - Dvorak - English
+xkb:us:colemak:eng    en_US_colemak # US - Colemak - English
+
 # Dutch
 # xkb:nl::nld           nl            # Netherlands - Dutch
 xkb:be::nld           nl            # Belgium - Dutch
@@ -64,13 +71,6 @@ m17n:vi:vni           vi            # Vietnames (VNI key sequence)
 # Vietnames input methods, except 4 input methods above, in m17n-db should
 # not work fine. The 4 input methods in m17n-db (>= 1.6.0) don't require the
 # feature.
-
-# U.S. English
-xkb:us::eng           en_US         # US - English
-xkb:us:intl:eng       en_US_intl    # US - International - English
-xkb:us:altgr-intl:eng en_US_altgr_intl  # US - Extended (AltGr) - English
-xkb:us:dvorak:eng     en_US_dvorak  # US - Dvorak - English
-xkb:us:colemak:eng    en_US_colemak # US - Colemak - English
 
 # Other languages
 hangul                ko            # ibus-hangul - Korean
