@@ -128,6 +128,10 @@ render_images() {
       --clear 0x${IMAGE_BACKGROUND_RGB} \
       --frame-interval 0 \
       --scale=0 \
+      --enable-vt1 \
+      --no-login \
+      --enable-gfx \
+      --pre-create-vts \
       ${ASSETS_IMAGE_PATH}/boot_message.png \
       ${image_file}"
 
