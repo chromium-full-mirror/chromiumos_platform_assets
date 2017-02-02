@@ -6,8 +6,13 @@
  * @fileoverview Event listener for the Google text-to-speech extension.
  *
  * This class implements the Chrome TTS engine extnesion API and dispatches
- * speech requests to an instance of TtsController, defined in
+ * speech requests to one or more instances of TtsController, defined in
  * tts_controller.js.
+ *
+ * Multiple instances are used so that the HMM voice can load immediately
+ * while the Unit Selection voice is loading in the background. Typically
+ * the HMM data is local while the Unit Selection data may need to be
+ * downloaded from a remote server.
  */
 
 'use strict';
@@ -44,28 +49,49 @@ var TtsMain = function() {
  */
 TtsMain.prototype.run = function() {
   document.addEventListener('unload', this.unload, false);
-  this.getVoiceNamesFromManifest_();
-  this.currentController_ = new TtsController('lstm', this, navigator.language);
-  chrome.ttsEngine.onSpeak.addListener(this.onSpeak.bind(this));
-  chrome.ttsEngine.onStop.addListener(this.onStop.bind(this));
+  this.getVoiceNamesFromManifest_(function() {
+    this.loadControllers_();
+    chrome.ttsEngine.onSpeak.addListener(this.onSpeak.bind(this));
+    chrome.ttsEngine.onStop.addListener(this.onStop.bind(this));
+  });
 };
 
 /**
- * Gets the voice list from the extension manifest and updates
- * window.voices accordingly.
+ * Loads the file 'manifest.json' and updates the voice name for
+ * all voices on window.voices
  * Matching is done by language plus gender.
  *
  * @private
+ * @param {callback} completion The function to call once we finish.
  */
-TtsMain.prototype.getVoiceNamesFromManifest_ = function() {
-  var manifestVoices = chrome.runtime.getManifest().tts_engine.voices;
-  var langGenderMap = {};
-  for (var i = 0, voice; voice = manifestVoices[i]; i++) {
-    langGenderMap[voice.lang + '-' + voice.gender] = voice.voice_name;
-  }
-  for (var i = 0, voice; voice = window.voices[i]; i++) {
-    voice.voiceName = langGenderMap[voice.lang + '-' + voice.gender];
-  }
+TtsMain.prototype.getVoiceNamesFromManifest_ = function(completion) {
+  var self = this;
+  var xmlHttpRequest = new XMLHttpRequest();
+  xmlHttpRequest.onload = function() {
+    var manifest = JSON.parse(this.responseText);
+    var manifestVoices = manifest.tts_engine.voices;
+    var langGenderMap = {};
+    for (var i = 0; i < manifestVoices.length; i++) {
+      langGenderMap[manifestVoices[i].lang + '-' + manifestVoices[i].gender] =
+          manifestVoices[i].voice_name;
+    }
+    for (var i = 0; i < window.voices.length; i++) {
+      window.voices[i].voiceName =
+          langGenderMap[window.voices[i].lang + '-' + window.voices[i].gender];
+    }
+    (completion.bind(self))();
+  };
+  xmlHttpRequest.open('get', chrome.extension.getURL('manifest.json'), true);
+  xmlHttpRequest.send();
+};
+
+/**
+ * Creates two tts controllers, one for unit selection and one for hmm.
+ * @private
+ */
+TtsMain.prototype.loadControllers_ = function() {
+  this.hmmController_ = new TtsController('hmm', this, navigator.language);
+  this.uselController_ = new TtsController('usel', this, navigator.language);
 };
 
 /**
@@ -106,7 +132,8 @@ TtsMain.prototype.onResponse = function(utteranceId, response) {
 TtsMain.prototype.onStop = function() {
   this.pendingSpeechRequest_ = null;
   this.callback_ = null;
-  this.currentController_.onStop();
+  this.hmmController_.onStop();
+  this.uselController_.onStop();
 };
 
 /**
@@ -120,9 +147,13 @@ TtsMain.prototype.onStop = function() {
 TtsMain.prototype.onSpeak = function(utterance, options, callback) {
   console.log('Will speak: "' + utterance + '" lang="' + options.lang + '"');
 
-  this.currentController_.switchVoiceIfNeeded(
+  this.hmmController_.switchVoiceIfNeeded(
       options.voiceName, options.lang, options.gender);
-  if (!this.currentController_.isInitialized()) {
+  this.uselController_.switchVoiceIfNeeded(
+      options.voiceName, options.lang, options.gender);
+
+  if (!this.hmmController_.isInitialized() &&
+      !this.uselController_.isInitialized()) {
     console.log('No text-to-speech controller is initialized yet.');
     if (this.pendingSpeechRequest_) {
       // Chrome takes care of queueing. The extension only needs to handle one
@@ -139,13 +170,22 @@ TtsMain.prototype.onSpeak = function(utterance, options, callback) {
     return;
   }
 
-  this.currentController_.onStop();
+  this.hmmController_.onStop();
+  this.uselController_.onStop();
 
   this.utteranceId_++;
   this.callback_ = callback;
   console.log('SETTING CALLBACK, id=' + this.utteranceId_);
 
-  this.currentController_.onSpeak(utterance, options, this.utteranceId_);
+  if (this.uselController_.isInitialized()) {
+    console.log('Using unit selection');
+    this.currentController = this.uselController_;
+  } else {
+    console.log('Using HMM');
+    this.currentController = this.hmmController_;
+  }
+
+  this.currentController.onSpeak(utterance, options, this.utteranceId_);
 };
 
 /**
@@ -170,7 +210,8 @@ TtsMain.prototype.speakPendingRequest_ = function() {
  * @private
  */
 TtsMain.prototype.unload_ = function() {
-  this.currentController_.unload();
+  this.hmmController_.unload();
+  this.uselController_.unload();
 };
 
 var ttsMain = new TtsMain();
