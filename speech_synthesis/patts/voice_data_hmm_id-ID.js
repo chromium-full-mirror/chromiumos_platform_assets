@@ -16,19 +16,19 @@ if (!window.voices) {
 
 // Add this voice to the global voice array.
 window.voices.push({
-  'pipelineFile': '/voice_lstm_ko-KR/lstm/pipeline',
+  'pipelineFile': '/voice_data_hmm_id-ID/pipeline',
   'prefix': '',
-  'voiceType': 'lstm',
+  'voiceType': 'hmm',
   'cacheToDisk': false,
-  'lang': 'ko-KR',
+  'lang': 'id-ID',
   'gender': 'female',
   'removePaths': [],
   'files': [
     {
-      'path': '/voice_lstm_ko-KR.zvoice',
+      'path': '/voice_data_hmm_id-ID.zvoice',
       'url': '',
-      'md5sum': '6c5d7d32eb55021d4e52694d4e377f70',
-      'size': 7618872,
+      'md5sum': '6fe1f70f04ec10932a8f27291d39636e',
+      'size': 3400524,
     },
   ],
 });
