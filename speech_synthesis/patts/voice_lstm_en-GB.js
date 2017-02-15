@@ -16,19 +16,19 @@ if (!window.voices) {
 
 // Add this voice to the global voice array.
 window.voices.push({
-  'pipelineFile': '/voice_data_hmm_id-ID/pipeline',
+  'pipelineFile': '/voice_lstm_en-GB/lstm/pipeline',
   'prefix': '',
-  'voiceType': 'hmm',
+  'voiceType': 'lstm',
   'cacheToDisk': false,
-  'lang': 'id-ID',
+  'lang': 'en-GB',
   'gender': 'female',
   'removePaths': [],
   'files': [
     {
-      'path': '/voice_data_hmm_id-ID.zvoice',
+      'path': '/voice_lstm_en-GB.zvoice',
       'url': '',
-      'md5sum': '6fe1f70f04ec10932a8f27291d39636e',
-      'size': 3400524,
+      'md5sum': '1974b53387c99b0373e2829be4fdc95b',
+      'size': 4475552,
     },
   ],
 });
