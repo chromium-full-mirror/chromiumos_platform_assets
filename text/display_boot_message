@@ -5,11 +5,11 @@
 #
 # Converts and displays UTF-8 based text message file from
 # /usr/share/chromeos-assets/text/boot_messages/$locale/$message.txt .
-# Uses pango-view to convert from txt to png, then ply-image to render png on
+# Uses pango-view to convert from txt to png, then frecon to render png on
 # frame buffer.
 
 # Default conversion parameters (can be overridden by environment variables)
-# Note pango-view and ply-image uses different color code format (#rrggbb vs
+# Note pango-view and frecon uses different color code format (#rrggbb vs
 # 0xrrggbb), so we use format 'rrggbb' in IMAGE_BACKGROUND_RGB and not
 # allowing common names.
 : ${IMAGE_BACKGROUND_RGB:=fefefe}
@@ -104,7 +104,7 @@ render_images() {
   local spinner_file="$SPINNER_IMAGE_BASE"*01.png
 
   # Keep a copy of file in temp folder and never delete so it won't be removed
-  # before the renderer (frecon or ply-image, running in background) is ready.
+  # before the renderer (frecon running in background) is ready.
   # This is required for factory wiping that file lives on stateful partition.
   # It will be removed only when system reboots.
   local image_file="$(create_temp_output)"
@@ -116,55 +116,41 @@ render_images() {
   local spinner_offset_x=-"$(( $(get_png_width "${image_file}") / 2 +
                                $(get_png_width ${spinner_file}) ))"
 
-  if [ -x /sbin/frecon ]; then
-    # Stop any running frecon instance.
-    pkill -9 frecon || true
+  # Stop any running frecon instance.
+  pkill -9 frecon || true
 
-    # By default frecon would exit after all images are displayed unless there
-    # is --loop-start or --dev-mode. Most boot-time messages need to keep the
-    # display until reboot so we want to always add --dev-mode.
+  # By default frecon would exit after all images are displayed unless there
+  # is --loop-start or --dev-mode. Most boot-time messages need to keep the
+  # display until reboot so we want to always add --dev-mode.
 
-    local params="--dev-mode \
-      --clear 0x${IMAGE_BACKGROUND_RGB} \
-      --frame-interval 0 \
-      --scale=0 \
-      --enable-vt1 \
-      --no-login \
-      --enable-gfx \
-      --pre-create-vts \
-      ${ASSETS_IMAGE_PATH}/boot_message.png \
-      ${image_file}"
+  local params="--dev-mode \
+    --clear 0x${IMAGE_BACKGROUND_RGB} \
+    --frame-interval 0 \
+    --scale=0 \
+    --enable-vt1 \
+    --no-login \
+    --enable-gfx \
+    --pre-create-vts \
+    ${ASSETS_IMAGE_PATH}/boot_message.png \
+    ${image_file}"
 
-    # Frecon requires all options specified before image files.
-    if need_spinner "${message}"; then
-      params="\
-        --loop-offset ${spinner_offset_x},0 \
-        --loop-interval ${SPINNER_INTERVAL} \
-        --loop-start 2 \
-        ${params} \
-        ${SPINNER_IMAGE_BASE}*.png"
-    fi
+  # Frecon requires all options specified before image files.
+  if need_spinner "${message}"; then
+    params="\
+      --loop-offset ${spinner_offset_x},0 \
+      --loop-interval ${SPINNER_INTERVAL} \
+      --loop-start 2 \
+      ${params} \
+      ${SPINNER_IMAGE_BASE}*.png"
+  fi
 
-    local pts="$(frecon --daemon ${params})"
-    # Simulate the TTY1 for text output (for example, progress bar).
-    # Some legacy scripts may create a broken TTY1 so we want to delete that if
-    # it is not a character device.
-    if [ -c "${pts}" -a ! -c /dev/tty1 ]; then
-      rm -f /dev/tty1
-      ln -sf "${pts}" /dev/tty1
-    fi
-  else
-    ply-image --clear 0x"$IMAGE_BACKGROUND_RGB" \
-      "$ASSETS_IMAGE_PATH/boot_message.png"
-    ply-image "$image_file" || rc=$?
-    if need_spinner "${message}"; then
-      while initctl status startup 2>&1 | grep -q "/running"; do
-        ply-image \
-          --offset "${spinner_offset_x},0" \
-          --frame-interval "${SPINNER_INTERVAL}" \
-          "${SPINNER_IMAGE_BASE}"*.png
-      done &
-    fi
+  local pts="$(frecon --daemon ${params})"
+  # Simulate the TTY1 for text output (for example, progress bar).
+  # Some legacy scripts may create a broken TTY1 so we want to delete that if
+  # it is not a character device.
+  if [ -c "${pts}" -a ! -c /dev/tty1 ]; then
+    rm -f /dev/tty1
+    ln -sf "${pts}" /dev/tty1
   fi
   return $rc
 }
