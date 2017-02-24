@@ -47,7 +47,7 @@ var TtsController = function(voiceType, delegate, defaultLanguage) {
   this.voice_ = null;
   this.voiceName_ = '';
   this.getDefaultVoice_();
-  this.AUDIO_CHANNEL_TIMEOUT_IN_MILLISECONDS_ = 30000;
+  this.IDLE_TIMEOUT_IN_MILLISECONDS_ = 5 * 60 * 1000;
 
   /**
    * When chunking the incoming utterance into smaller pieces to send
@@ -80,15 +80,42 @@ var TtsController = function(voiceType, delegate, defaultLanguage) {
 };
 
 /**
- * @private
+ * Must be called before invoking onSpeak(), if the TtsController
+ * reports that it is not yet initialized. The controller will
+ * create and initialize the NaCl module and notify the delegate
+ * when initialization completes, and it is ready to process
+ * commands.
+ * If TTS falls idle for some period then it may become
+ * un-initialized again, so the caller must verify initialization
+ * before each onSpeak() attempt.
+ */
+TtsController.prototype.ensureInitialized = function() {
+  console.assert(!this.nativeTts_ && !this.initialized_);
+
+  var embed = document.createElement('embed');
+  embed.setAttribute('id', 'tts' + this.voiceType_);
+  embed.setAttribute('name', 'nacl_module');
+  embed.setAttribute('src', 'tts_service.nmf');
+  embed.setAttribute('type', 'application/x-nacl');
+  embed.addEventListener('load', this.load.bind(this), false);
+  document.body.appendChild(embed);
+  this.nativeTts_ = embed;
+
+  // Native Client appears to be buggy and only starts load if any property gets
+  // accessed. Do that now by checking for lastError.
+  if (embed.lastError)
+    console.error('Error while loading native module: ' + embed.lastError);
+}
+
+/**
  * Initializes the current voice according to the default language.
+ * @private
  */
 TtsController.prototype.getDefaultVoice_ = function() {
   this.voice_ = this.findBestMatchingVoice_(this.defaultLanguage_,
       '');
   if (this.voice_) {
     this.voiceName_ = this.voice_.voiceName;
-    this.createNativeTts_();
   }
 };
 
@@ -102,9 +129,14 @@ TtsController.prototype.getDefaultVoice_ = function() {
  * @param {string} utteranceId The Identifier for the utterance to say.
  */
 TtsController.prototype.onSpeak = function(utterance, options, utteranceId) {
+  if (!this.nativeTts_) {
+    console.error("nativeTts not initialized");
+    return;
+  }
   if (!this.initialized_) {
     console.error('Error: TtsController for voiceType=' + this.voiceType_ +
-                  ' is not initialized.');
+        ' is not initialized.');
+    return;
   }
 
   this.nativeTts_.postMessage('stop');
@@ -205,17 +237,9 @@ TtsController.prototype.switchVoiceIfNeeded = function(
                                        preferredGender);
   if (voice && voice.voiceName != this.voiceName_) {
     console.log('Switching to voice: ' + voice.voiceName);
-    if (this.nativeTts_) {
-      this.nativeTts_.removeEventListener(
-          'message', this.handleMessageCallback_, false);
-      this.unload();
-      this.nativeTts_.parentElement.removeChild(this.nativeTts_);
-    }
-    this.nativeTts_ = null;
-    this.initialized_ = false;
+    this.destroyNativeTts_();
     this.voice_ = voice;
     this.voiceName_ = voice.voiceName;
-    this.createNativeTts_();
     return true;
   }
 
@@ -328,6 +352,7 @@ TtsController.prototype.handleMessage = function(messageEvent) {
     } else {
       this.sendResponse_(id, 'end');
     }
+    this.setIdleTimeout_();
   } else if (data == 'error') {
     console.log('error');
   } else if (data == 'idle' && !this.initialized_) {
@@ -457,24 +482,19 @@ TtsController.prototype.load = function() {
 };
 
 /**
- * Loads the nacl compiled tts engine
+ * Tears down the TTS engine NaCl module.
  * @private
  */
-TtsController.prototype.createNativeTts_ = function() {
-  var embed = document.createElement('embed');
-  embed.setAttribute('id', 'tts' + this.voiceType_);
-  embed.setAttribute('name', 'nacl_module');
-  embed.setAttribute('src', 'tts_service.nmf');
-  embed.setAttribute('type', 'application/x-nacl');
-  embed.addEventListener('load', this.load.bind(this), false);
-  document.body.appendChild(embed);
-  this.nativeTts_ = embed;
-
-  // Native Client appears to be buggy and only starts load if any property gets
-  // accessed. Do that now by checking for lastError.
-  if (embed.lastError)
-    console.error('Error while loading native module: ' + embed.lastError);
-};
+TtsController.prototype.destroyNativeTts_ = function() {
+  if (this.nativeTts_) {
+    this.nativeTts_.removeEventListener(
+        'message', this.handleMessageCallback_, false);
+    this.unload();
+    this.nativeTts_.parentElement.removeChild(this.nativeTts_);
+  }
+  this.nativeTts_ = null;
+  this.initialized_ = false;
+}
 
 /**
  * Clears any pending timeouts we may have.
@@ -504,7 +524,7 @@ TtsController.prototype.escapePluginArg_ = function(str) {
  * message to the engine.
  */
 TtsController.prototype.onStop = function() {
-  if (!this.initialized_) {
+  if (!this.nativeTts_ || !this.initialized_) {
     return;
   }
 
@@ -546,14 +566,15 @@ TtsController.prototype.clearIdleTimeout_ = function() {
  * @private
  */
 TtsController.prototype.setIdleTimeout_ = function() {
+  console.log("Setting idle timeout");
   this.clearIdleTimeout_();
   this.idleTimeout_ = window.setTimeout((function() {
     if (this.nativeTts_ && this.initialized_) {
-      console.log('Closing audio channel after ' +
-        (this.AUDIO_CHANNEL_TIMEOUT_IN_MILLISECONDS_ / 1000) +
+      console.log('Closing native TTS after ' +
+        (this.IDLE_TIMEOUT_IN_MILLISECONDS_ / 1000) +
         ' seconds of idle.');
-      this.nativeTts_.postMessage('closeAudioChannel');
+      this.destroyNativeTts_();
     }
     this.idleTimeout_ = null;
-  }).bind(this), this.AUDIO_CHANNEL_TIMEOUT_IN_MILLISECONDS_);
+  }).bind(this), this.IDLE_TIMEOUT_IN_MILLISECONDS_);
 };

@@ -1,10 +1,11 @@
 {
   "name": "Chrome OS built-in text-to-speech extension",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "This is a high-quality text-to-speech (TTS) voice extension that runs in your browser using Native Client technology.",
   "manifest_version": 2,
   "incognito": "split",
   "background": {
+    "persistent": false,
     "scripts": [
       "voice_lstm_hi-IN.js",
       "voice_lstm_id-ID.js",

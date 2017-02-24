@@ -69,7 +69,7 @@ TtsMain.prototype.getVoiceNamesFromManifest_ = function() {
 };
 
 /**
- * Called by one of the TTS controllers when it finishes it's initialization.
+ * Called by one of the TTS controllers when it finishes its initialization.
  */
 TtsMain.prototype.onInitialized = function() {
   this.speakPendingRequest_();
@@ -123,6 +123,7 @@ TtsMain.prototype.onSpeak = function(utterance, options, callback) {
   this.currentController_.switchVoiceIfNeeded(
       options.voiceName, options.lang, options.gender);
   if (!this.currentController_.isInitialized()) {
+    this.currentController_.ensureInitialized();
     console.log('No text-to-speech controller is initialized yet.');
     if (this.pendingSpeechRequest_) {
       // Chrome takes care of queueing. The extension only needs to handle one
