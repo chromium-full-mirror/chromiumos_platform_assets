@@ -90,16 +90,18 @@ var TtsController = function(voiceType, delegate, defaultLanguage) {
  * before each onSpeak() attempt.
  */
 TtsController.prototype.ensureInitialized = function() {
-  console.assert(!this.nativeTts_ && !this.initialized_);
+  console.assert(!this.initialized_);
 
-  var embed = document.createElement('embed');
-  embed.setAttribute('id', 'tts' + this.voiceType_);
-  embed.setAttribute('name', 'nacl_module');
-  embed.setAttribute('src', 'tts_service.nmf');
-  embed.setAttribute('type', 'application/x-nacl');
-  embed.addEventListener('load', this.load.bind(this), false);
-  document.body.appendChild(embed);
-  this.nativeTts_ = embed;
+  if (!this.nativeTts_) {
+    var embed = document.createElement('embed');
+    embed.setAttribute('id', 'tts' + this.voiceType_);
+    embed.setAttribute('name', 'nacl_module');
+    embed.setAttribute('src', 'tts_service.nmf');
+    embed.setAttribute('type', 'application/x-nacl');
+    embed.addEventListener('load', this.load.bind(this), false);
+    document.body.appendChild(embed);
+    this.nativeTts_ = embed;
+  }
 
   // Native Client appears to be buggy and only starts load if any property gets
   // accessed. Do that now by checking for lastError.
