@@ -90,7 +90,10 @@ var TtsController = function(voiceType, delegate, defaultLanguage) {
  * before each onSpeak() attempt.
  */
 TtsController.prototype.ensureInitialized = function() {
-  console.assert(!this.nativeTts_ && !this.initialized_);
+  console.assert(!this.initialized_);
+
+  if (this.nativeTts_)
+    return;
 
   var embed = document.createElement('embed');
   embed.setAttribute('id', 'tts' + this.voiceType_);
