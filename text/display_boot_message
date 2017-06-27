@@ -116,6 +116,8 @@ render_images() {
   local spinner_offset_x=-"$(( $(get_png_width "${image_file}") / 2 +
                                $(get_png_width ${spinner_file}) ))"
 
+  # TODO(hungte) Figure out a way to render using OSC in frecon if there is
+  # already a frecon instance running.
   # Stop any running frecon instance.
   pkill -9 frecon || true
 
@@ -144,15 +146,19 @@ render_images() {
       ${SPINNER_IMAGE_BASE}*.png"
   fi
 
-  local pts="$(frecon --daemon ${params})"
+  frecon --daemon ${params}
   # Simulate the TTY1 for text output (for example, progress bar).
   # Some legacy scripts may create a broken TTY1 so we want to delete that if
-  # it is not a character device.
-  if [ -c "${pts}" -a ! -c /dev/tty1 ]; then
-    rm -f /dev/tty1
-    ln -sf "${pts}" /dev/tty1
-  fi
-  return $rc
+  # it is not a character device. Note the vtN in /run/frecon starts from 0.
+  local i="" frecon_vt="/run/frecon/vt" tty=""
+  for i in 0 1 2 3; do
+    tty="/dev/tty$((i + 1))"
+    if [ -c "${frecon_vt}${i}" ] && [ ! -c "${tty}" ]; then
+      rm -f "${tty}"
+      ln -sf "${frecon_vt}${i}" "${tty}"
+    fi
+  done
+  return ${rc}
 }
 
 # Shows an arbitrary text file.
