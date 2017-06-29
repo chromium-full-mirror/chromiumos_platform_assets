@@ -4,7 +4,7 @@
 # found in the LICENSE file.
 #
 # Converts and displays UTF-8 based text message file from
-# /usr/share/chromeos-assets/text/boot_messages/$locale/$message.txt .
+# /usr/share/chromeos-assets/text/boot_messages/${locale}/${message}.txt .
 # Uses pango-view to convert from txt to png, then frecon to render png on
 # frame buffer.
 
@@ -21,6 +21,12 @@
 : ${ASSETS_IMAGE_PATH:=/usr/share/chromeos-assets/images}
 : ${SPINNER_IMAGE_BASE:=/usr/share/chromeos-assets/images/spinner/48x48}
 : ${SPINNER_INTERVAL:=100}
+: ${PROGRESS_BAR_RGB:=d0d0d0}
+
+isatty() {
+  local path="$1"
+  [ -t 0 ] <"${path}"
+}
 
 create_temp_output() {
   # File extension (.png) is required for render engine (pango-view) to decide
@@ -33,8 +39,8 @@ get_png_width() {
   local input="$1"
   local width
   # Get image width (the 17~20 bytes of PNG file in big-endian).
-  width="$(dd if="$input" bs=1 count=4 skip=16 2>/dev/null | od -A n -t x1)"
-  echo "$(( 0x$(echo "$width" | sed 's/ //g') ))"
+  width="$(dd if="${input}" bs=1 count=4 skip=16 2>/dev/null | od -A n -t x1)"
+  echo "$(( 0x$(echo "${width}" | sed 's/ //g') ))"
 }
 
 # Converts a text file to PNG file by pango-view without further postprocessing.
@@ -43,14 +49,14 @@ txt_to_png() {
   local output="$2"
   local locale="$3"
   local option="$4"
-  pango-view -q --output="$output" \
+  pango-view -q --output="${output}" \
     --dpi=72 --align=left --hinting=full \
-    --margin="$IMAGE_MARGIN_SIZE"\
-    --font="$IMAGE_FONT_NAME $IMAGE_FONT_SIZE" \
-    --foreground="$IMAGE_TEXT_COLOR" \
-    --background="#$IMAGE_BACKGROUND_RGB" \
-    --language="$locale" \
-    $option "$input"
+    --margin="${IMAGE_MARGIN_SIZE}"\
+    --font="${IMAGE_FONT_NAME} ${IMAGE_FONT_SIZE}" \
+    --foreground="${IMAGE_TEXT_COLOR}" \
+    --background="#${IMAGE_BACKGROUND_RGB}" \
+    --language="${locale}" \
+    ${option} "${input}"
 }
 
 # Converts a message file to PNG format to fit into given size.
@@ -61,7 +67,7 @@ message_to_png() {
   local max_size_file="$4"
   local extra_options="$5"
 
-  txt_to_png "$input" "$output" "$locale" "$extra_options"
+  txt_to_png "${input}" "${output}" "${locale}" "${extra_options}"
 
   # We prefer a "left-aligned text image on center of screen, with text
   # wrapped by margin of its background image (max_size_file)". However if a
@@ -70,12 +76,12 @@ message_to_png() {
   # image which is always aligned to left of background, not on center. To fix
   # that, we first create the file, compare the width, and assign --width only
   # if we need wrapping.
-  if [ -f "$max_size_file" ]; then
-    local max_width="$(get_png_width "$max_size_file")"
-    local width="$(get_png_width "$output")"
-    if [ "$max_width" -gt 0 -a "$width" -gt "$max_width" ]; then
-      extra_options="$extra_options --width=$max_width"
-      txt_to_png "$input" "$output" "$locale" "$extra_options"
+  if [ -f "${max_size_file}" ]; then
+    local max_width="$(get_png_width "${max_size_file}")"
+    local width="$(get_png_width "${output}")"
+    if [ "${max_width}" -gt 0 -a "${width}" -gt "${max_width}" ]; then
+      extra_options="${extra_options} --width=${max_width}"
+      txt_to_png "${input}" "${output}" "${locale}" "${extra_options}"
     fi
   fi
 }
@@ -84,7 +90,7 @@ message_to_png() {
 need_spinner() {
   local message="$1"
 
-  case "$message" in
+  case "${message}" in
     enter_dev2 | leave_dev | self_repair | update_firmware | power_wash | \
       show_spinner | wipe)
       return 0
@@ -101,14 +107,14 @@ render_images() {
   local message="$1"
   local file="$2"
   local spiner_offset=""
-  local spinner_file="$SPINNER_IMAGE_BASE"*01.png
+  local spinner_file="${SPINNER_IMAGE_BASE}"*01.png
 
   # Keep a copy of file in temp folder and never delete so it won't be removed
   # before the renderer (frecon running in background) is ready.
   # This is required for factory wiping that file lives on stateful partition.
   # It will be removed only when system reboots.
   local image_file="$(create_temp_output)"
-  cp -f "$file" "$image_file"
+  cp -f "${file}" "${image_file}"
 
   # Put spinner in left of centered message file, with a padding of 1/2 spinner
   # image width (offset is calculated from the default location, which puts
@@ -153,7 +159,7 @@ render_images() {
   local i="" frecon_vt="/run/frecon/vt" tty=""
   for i in 0 1 2 3; do
     tty="/dev/tty$((i + 1))"
-    if [ -c "${frecon_vt}${i}" ] && [ ! -c "${tty}" ]; then
+    if isatty "${frecon_vt}${i}" && ! isatty "${tty}"; then
       rm -f "${tty}"
       ln -sf "${frecon_vt}${i}" "${tty}"
     fi
@@ -173,25 +179,25 @@ show_text_file() {
   # don't know when the file will be accessed; so keep the file undeleted until
   # next boot.
   local output="$(create_temp_output)"
-  message_to_png "$file" "$output" "$locale" \
-    "$ASSETS_IMAGE_PATH/boot_message.png" "$options" &&
-  render_images "$message" "$output" || rc=$?
-  rm -f "$output"
-  return $rc
+  message_to_png "${file}" "${output}" "${locale}" \
+    "${ASSETS_IMAGE_PATH}/boot_message.png" "${options}" &&
+  render_images "${message}" "${output}" || rc=$?
+  rm -f "${output}"
+  return ${rc}
 }
 
-# Shows a predefined and localized message from $MESSAGE_BASE_PATH.
+# Shows a predefined and localized message from ${MESSAGE_BASE_PATH}.
 show_message() {
   local message="$1"
   local locales="$2"
   local rc=0
   local locale file
 
-  for locale in $locales; do
-    file="$MESSAGE_BASE_PATH/$locale/$message.txt"
-    [ -f "$file" ] || continue
-    show_text_file "$message" "$locale" "$file" "" || rc=$?
-    return $rc
+  for locale in ${locales}; do
+    file="${MESSAGE_BASE_PATH}/${locale}/${message}.txt"
+    [ -f "${file}" ] || continue
+    show_text_file "${message}" "${locale}" "${file}" "" || rc=$?
+    return ${rc}
   done
   # If none of given locales have this message, return as failure.
   return 1
@@ -202,28 +208,90 @@ show_file() {
   local message="$1"
   local file="$2"
 
-  case "$file" in
+  case "${file}" in
     *.png)
-      render_images "$message" "$file"
+      render_images "${message}" "${file}"
       ;;
 
     *)
-      show_text_file "$message" "" "$file" "--markup"
+      show_text_file "${message}" "" "${file}" "--markup"
       ;;
   esac
 }
 
-main() {
-  if [ "$#" != "2" ]; then
-    echo "Usage: $0 [MESSAGE LOCALES | show_file FILE | show_spinner FILE]" >&2
-    exit 1
+# Draw a box using frecon box drawing escape sequences.
+draw_box() {
+  local width="$1"
+  local height="$2"
+  local color="$3"
+  local offset_x="$4"
+  local offset_y="$5"
+
+  # Bail out if the frecon terminal doesn't exist.
+  isatty /run/frecon/vt0 || return 1
+
+  printf '\033]box:color=0x%s;size=%u,%u;offset=%d,%d;scale=0\033\\' \
+    "${color}" "${width}" "${height}" "${offset_x}" "${offset_y}" \
+    > /run/frecon/vt0
+}
+
+# Updates the progress bar. This requires frecon to already be set up, e.g. by
+# previously invoking display_boot_message to show a message.
+update_progress() {
+  local progress="$1"
+
+  # Draw the frame. The calculations below size the bar to be half the width of
+  # the maximum message width, and 20 times as wide as high. The bar should show
+  # below the message, so it's offset by 5 times its height to the bottom.
+  local width="$(get_png_width "${ASSETS_IMAGE_PATH}/boot_message.png")"
+  local bar_width="$(( width / 2 ))"
+  local bar_height="$(( bar_width / 20 ))"
+  local bar_offset_y="$(( bar_height * 5 ))"
+
+  # The frame is created by a solid rectangle of the full bar dimension,
+  # overlayed with a slightly smaller rectangle in background color (2 pixels on
+  # each edge) to punch out the interior.
+  draw_box "${bar_width}" "${bar_height}" \
+    "${PROGRESS_BAR_RGB}" "0" "${bar_offset_y}"
+  draw_box "$(( bar_width - 4 ))" "$(( bar_height - 4 ))" \
+    "${IMAGE_BACKGROUND_RGB}" "0" "${bar_offset_y}"
+
+  # Draw the progress bar.
+  if [ "$((progress))" -lt 0 ]; then
+    progress=0
+  fi
+  if [ "$((progress))" -gt 100 ]; then
+    progress=100
   fi
 
+  # The progress rectangle itself is slightly smaller than the frame (2 pixels
+  # on each edge), and needs to be offset to the left so it doesn't show at the
+  # center of the bar, but aligned with the left edge.
+  local progress_width="$(( ((bar_width - 8) * progress) / 100 ))"
+  local progress_offset=-"$(( (bar_width - 8 - progress_width) / 2 ))"
+  draw_box "${progress_width}" "$(( bar_height - 8 ))" \
+    "${PROGRESS_BAR_RGB}" "${progress_offset}" "${bar_offset_y}"
+}
+
+usage() {
+  cat <<EOL >&2
+Usage: $0 [MESSAGE LOCALES | show_file FILE | show_spinner FILE |
+           update_progress PERCENTAGE]"
+EOL
+  exit 1
+}
+
+main() {
+  [ "$#" = "2" ] || usage
+
   case "$1" in
-    show_file | show_spinner)
+    show_file|show_spinner)
       show_file "$1" "$2"
       ;;
-    * )
+    update_progress)
+      update_progress "$2"
+      ;;
+    *)
       show_message "$1" "$2"
       ;;
   esac
