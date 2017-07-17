@@ -71,6 +71,14 @@
         file="en/block_devmode.txt" />
       <structure type="txt" name="BLOCK_DEVMODE_VIRTUAL"
         file="en/block_devmode_virtual.txt" />
+      <structure type="txt" name="UPDATE_TPM_FIRMWARE"
+        file="en/update_tpm_firmware.txt" />
+      <structure type="txt" name="UPDATE_TPM_FIRMWARE_FAILURE"
+        file="en/update_tpm_firmware_failure.txt" />
+      <structure type="txt" name="UPDATE_TPM_FIRMWARE_LOW_BATTERY"
+        file="en/update_tpm_firmware_low_battery.txt" />
+      <structure type="txt" name="UPDATE_TPM_FIRMWARE_LOW_BATTERY_CHARGING"
+        file="en/update_tpm_firmware_low_battery_charging.txt" />
     </structures>
   </release>
 </grit>
