@@ -73,6 +73,8 @@
         file="en/block_devmode_virtual.txt" />
       <structure type="txt" name="UPDATE_DETACHABLE_BASE_FIRMWARE"
         file="en/update_detachable_base_firmware.txt" />
+      <structure type="txt" name="UPDATE_TOUCHPAD_FIRMWARE"
+        file="en/update_touchpad_firmware.txt" />
       <structure type="txt" name="UPDATE_TPM_FIRMWARE"
         file="en/update_tpm_firmware.txt" />
       <structure type="txt" name="UPDATE_TPM_FIRMWARE_FAILURE"
