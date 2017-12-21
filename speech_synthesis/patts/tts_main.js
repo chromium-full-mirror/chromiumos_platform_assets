@@ -25,9 +25,17 @@
  * finalization, cancellation.
  */
 var PendingRequest = function(utterance, options, callback) {
-  this.utterance = utterance;
+  this.original = utterance;
+  // We will ask the TTS engine to speak the utterance without any
+  // whitespace at the beginning, because it can cause the word
+  // callbacks to be incorrect. See b/70898596.
+  this.utterance = utterance.trimLeft();
   this.options = options;
   this.callback = callback;
+  // Keep track of the difference in length between the original
+  // string from the user and the string we are asking TTS to
+  // speak.
+  this.offset = this.original.length - this.utterance.length;
 };
 
 var TtsMain = function() {
@@ -37,6 +45,7 @@ var TtsMain = function() {
   this.lang_ = '';
   this.voiceName_ = '';
   this.pendingSpeechRequest_ = null;
+  this.offset_ = 0;
 };
 
 /**
@@ -92,6 +101,12 @@ TtsMain.prototype.onResponse = function(utteranceId, response) {
   console.log('onResponse type=' + response.type +
               ' utteranceId=' + utteranceId);
 
+  // We asked TTS to speak the original string trimmed of any whitespace
+  // at the beginning. This addresses part of b/70898596, but we must add
+  // back the number of trimmed whitespace characters to give the caller
+  // a charIndex into their original, untrimmed string.
+  response.charIndex += this.offset_;
+
   this.callback_(response);
   var type = response.type;
   if (type == 'end' || type == 'interrupted' ||
@@ -105,6 +120,7 @@ TtsMain.prototype.onResponse = function(utteranceId, response) {
  */
 TtsMain.prototype.onStop = function() {
   this.pendingSpeechRequest_ = null;
+  this.offset_ = 0;
   this.callback_ = null;
   this.currentController_.onStop();
 };
@@ -133,6 +149,7 @@ TtsMain.prototype.onSpeak = function(utterance, options, callback) {
       var pendingCallback = this.pendingSpeechRequest_.callback;
       pendingCallback(response);
       this.pendingSpeechRequest_ = null;
+      this.offset_ = 0;
     }
 
     this.pendingSpeechRequest_ = new PendingRequest(utterance, options,
@@ -162,6 +179,7 @@ TtsMain.prototype.speakPendingRequest_ = function() {
   var utterance = this.pendingSpeechRequest_.utterance;
   var options = this.pendingSpeechRequest_.options;
   var callback = this.pendingSpeechRequest_.callback;
+  this.offset_ = this.pendingSpeechRequest_.offset;
   this.pendingSpeechRequest_ = null;
   this.onSpeak(utterance, options, callback);
 };
