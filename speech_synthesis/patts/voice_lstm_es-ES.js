@@ -27,8 +27,8 @@ window.voices.push({
     {
       'path': '/voice_lstm_es-ES.zvoice',
       'url': '',
-      'md5sum': 'a038402081966316c0b7151845eb24b7',
-      'size': 12488269,
+      'md5sum': 'bba73c19eb1f717a1f3d99e0e4380048',
+      'size': 5849288,
     },
   ],
 });

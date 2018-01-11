@@ -21,14 +21,14 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': false,
   'lang': 'ko-KR',
-  'gender': 'female',
+  'gender': 'male',
   'removePaths': [],
   'files': [
     {
       'path': '/voice_lstm_ko-KR.zvoice',
       'url': '',
-      'md5sum': 'c26d5534b227c5c3cdeb28ed3784ccd0',
-      'size': 6049421,
+      'md5sum': '91d48a54ad3cbf85d4312b4c4f9ba728',
+      'size': 6028447,
     },
   ],
 });

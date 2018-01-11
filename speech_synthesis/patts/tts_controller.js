@@ -152,6 +152,7 @@ TtsController.prototype.onSpeak = function(utterance, options, utteranceId) {
   this.remainingUtteranceText_ = utterance;
   this.nextCharOffset_ = 0;
   this.chunkCharOffset_ = 0;
+  this.startTimeMillis_ = undefined;
 
   this.speakNextChunk_();
 };
@@ -385,7 +386,7 @@ TtsController.prototype.handleMessage = function(messageEvent) {
  */
 TtsController.prototype.handleTtsEvent_ = function(id, deltaTimeSec,
                                                    charIndex) {
-  if (deltaTimeSec == 0.0 && charIndex == 0) {
+  if (this.startTimeMillis_ === undefined && charIndex == 0) {
     this.startTimeMillis_ = new Date();
     if (this.chunkCharOffset_ == 0)
       this.sendResponse_(id, 'start');
