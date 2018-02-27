@@ -54,18 +54,21 @@ var TtsController = function(voiceType, delegate, defaultLanguage) {
    * to the engine at a time, this contains the remaining text to be
    * spoken after the current chunk finishes.
    * @type {string|null}
+   * @private
    */
   this.remainingUtteranceText_ = null;
 
   /**
    * The character offset of the next chunk.
    * @type {number}
+   * @private
    */
   this.nextCharOffset_ = 0;
 
   /**
    * The character offset of the current chunk.
    * @type {number}
+   * @private
    */
   this.chunkCharOffset_ = 0;
 
@@ -75,8 +78,9 @@ var TtsController = function(voiceType, delegate, defaultLanguage) {
    * try to break on a sentence boundary.
    * @type {number}
    * @const
+   * @private
    */
-  this.MAXIMUM_CHUNK_LEN = 512;
+  this.MAXIMUM_CHUNK_LEN_ = 2000;
 };
 
 /**
@@ -108,7 +112,7 @@ TtsController.prototype.ensureInitialized = function() {
   // accessed. Do that now by checking for lastError.
   if (embed.lastError)
     console.error('Error while loading native module: ' + embed.lastError);
-}
+};
 
 /**
  * Initializes the current voice according to the default language.
@@ -159,6 +163,7 @@ TtsController.prototype.onSpeak = function(utterance, options, utteranceId) {
 
 /**
  * Pull some more text from |this.remainingUtteranceText_| and speak it.
+ * @private
  */
 TtsController.prototype.speakNextChunk_ = function() {
   this.clearTimeouts_();
@@ -178,8 +183,9 @@ TtsController.prototype.speakNextChunk_ = function() {
  * possible, trying to end on the last sentence boundary (period, exclamation,
  * or question mark followed by space), other punctuation boundary (comma,
  * semicolon, etc. followed by space), or whitespace boundary.
- * Return that chunk, and remove those characters from
+ * @return {string} that chunk, and remove those characters from
  * |this.remainingUtteranceText_|.
+ * @private
  */
 TtsController.prototype.getNextChunk_ = function() {
   var text = this.remainingUtteranceText_;
@@ -187,7 +193,7 @@ TtsController.prototype.getNextChunk_ = function() {
 
   // If the utterance is less than the maximum chunk length already,
   // just return it.
-  if (len < this.MAXIMUM_CHUNK_LEN) {
+  if (len < this.MAXIMUM_CHUNK_LEN_) {
     this.remainingUtteranceText_ = null;
     return text;
   }
@@ -198,7 +204,7 @@ TtsController.prototype.getNextChunk_ = function() {
   var lastSentenceEnd = 0;
   var lastOtherPunctuation = 0;
   var lastWhitespace = 0;
-  for (var i = 1; i < this.MAXIMUM_CHUNK_LEN; i++) {
+  for (var i = 1; i < this.MAXIMUM_CHUNK_LEN_; i++) {
     var prev = text[i - 1];
     var ch = text[i];
     if (!/\s/.test(ch))
@@ -212,7 +218,7 @@ TtsController.prototype.getNextChunk_ = function() {
     }
   }
 
-  var chunkLen = this.MAXIMUM_CHUNK_LEN;
+  var chunkLen = this.MAXIMUM_CHUNK_LEN_;
   if (lastSentenceEnd) {
     chunkLen = lastSentenceEnd;
   } else if (lastOtherPunctuation) {
@@ -498,7 +504,7 @@ TtsController.prototype.destroyNativeTts_ = function() {
   }
   this.nativeTts_ = null;
   this.initialized_ = false;
-}
+};
 
 /**
  * Clears any pending timeouts we may have.

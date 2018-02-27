@@ -30,6 +30,9 @@ var PendingRequest = function(utterance, options, callback) {
   this.callback = callback;
 };
 
+/**
+ * @constructor
+ */
 var TtsMain = function() {
   this.callback_ = null;
   this.utteranceId_ = 0;
@@ -123,7 +126,8 @@ TtsMain.prototype.onStop = function() {
  * @param {string} utterance The utterance to say.
  * @param {object} options The options affecting the speech, like language,
  *     pitch, rate, etc.
- * @param {function} callback The function to recieve messages from the engine.
+ * @param {function(object)} callback The function to receive messages from the
+ * engine.
  */
 TtsMain.prototype.onSpeak = function(utterance, options, callback) {
   console.log('Will speak: "' + utterance + '" lang="' + options.lang + '"');
