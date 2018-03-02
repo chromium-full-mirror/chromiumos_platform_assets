@@ -48,6 +48,8 @@ var TtsController = function(voiceType, delegate, defaultLanguage) {
   this.voiceName_ = '';
   this.getDefaultVoice_();
   this.IDLE_TIMEOUT_IN_MILLISECONDS_ = 5 * 60 * 1000;
+  this.TTS_TOKEN_START = 0;
+  this.TTS_TOKEN_END = 1;
 
   /**
    * When chunking the incoming utterance into smaller pieces to send
@@ -374,7 +376,8 @@ TtsController.prototype.handleMessage = function(messageEvent) {
     var tokens = data.split(':');
     this.handleTtsEvent_(parseInt(tokens[1], 10),
                          parseFloat(tokens[2]),
-                         parseInt(tokens[3], 10));
+                         parseInt(tokens[3], 10),
+                         parseInt(tokens[4], 10));
   }
 };
 
@@ -389,16 +392,21 @@ TtsController.prototype.handleMessage = function(messageEvent) {
  *     need to wait to send it.
  * @param {number} charIndex The position in the input utterance this event
  *     is about.
+ * @param {number} ttsEventType Token type, either TTS_TOKEN_START or
+ *     TTS_TOKEN_END.
  */
 TtsController.prototype.handleTtsEvent_ = function(id, deltaTimeSec,
-                                                   charIndex) {
-  if (this.startTimeMillis_ === undefined && charIndex == 0) {
+                                                   charIndex, ttsEventType) {
+  if (this.startTimeMillis_ === undefined) {
+    // This is the first event we've received.
     this.startTimeMillis_ = new Date();
     if (this.chunkCharOffset_ == 0)
-      this.sendResponse_(id, 'start');
-    return;
+      this.sendResponse_(id, 'start', 0);
   }
-
+  if (ttsEventType == this.TTS_TOKEN_START) {
+      // Ignore all word start events.
+      return;
+  }
   var currentTimeMillis = (new Date() - this.startTimeMillis_);
   if (currentTimeMillis > 1000 * deltaTimeSec) {
     this.sendResponse_(id, 'word',
