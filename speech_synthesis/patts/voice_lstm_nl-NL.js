@@ -16,8 +16,8 @@ if (!window.voices) {
 
 // Add this voice to the global voice array.
 window.voices.push({
-  'pipelineFile': '/voice_lstm_nl-NL/lstm/pipeline',
-  'prefix': '',
+  'pipelineFile': '/voice_lstm_nl-NL/tfb/pipeline',
+  'prefix': '/voice_lstm_nl-NL/tfb/',
   'voiceType': 'lstm',
   'cacheToDisk': false,
   'lang': 'nl-NL',
@@ -27,8 +27,8 @@ window.voices.push({
     {
       'path': '/voice_lstm_nl-NL.zvoice',
       'url': '',
-      'md5sum': 'b0d7e10a2490b92c10c5fc8e9fb228de',
-      'size': 6097130,
+      'md5sum': '17c72d67ec3bc0d38963a78d782faadc',
+      'size': 6160553,
     },
   ],
 });

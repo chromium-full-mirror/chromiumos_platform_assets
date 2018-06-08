@@ -16,19 +16,19 @@ if (!window.voices) {
 
 // Add this voice to the global voice array.
 window.voices.push({
-  'pipelineFile': '/voice_lstm_es-US/lstm/pipeline',
-  'prefix': '',
+  'pipelineFile': '/remote_voice_lstm_el-GR/vfz/pipeline',
+  'prefix': '/remote_voice_lstm_el-GR/vfz/',
   'voiceType': 'lstm',
-  'cacheToDisk': false,
-  'lang': 'es-US',
+  'cacheToDisk': true,
+  'lang': 'el-GR',
   'gender': 'female',
   'removePaths': [],
   'files': [
     {
-      'path': '/voice_lstm_es-US.zvoice',
-      'url': '',
-      'md5sum': 'd0b017dab23a68e02dd6dc4819327057',
-      'size': 5279574,
+      'path': '/remote_voice_lstm_el-GR.zvoice',
+      'url': 'https://redirector.gvt1.com/edgedl/android/tts/v16/el-gr-r2.zvoice',
+      'md5sum': '95b3fdda122ef2004ae82161d8b03e4e',
+      'size': 4733005,
     },
   ],
 });

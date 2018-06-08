@@ -16,8 +16,8 @@ if (!window.voices) {
 
 // Add this voice to the global voice array.
 window.voices.push({
-  'pipelineFile': '/voice_lstm_es-ES/lstm/pipeline',
-  'prefix': '',
+  'pipelineFile': '/voice_lstm_es-ES/ana/pipeline',
+  'prefix': '/voice_lstm_es-ES/ana/',
   'voiceType': 'lstm',
   'cacheToDisk': false,
   'lang': 'es-ES',
@@ -27,8 +27,8 @@ window.voices.push({
     {
       'path': '/voice_lstm_es-ES.zvoice',
       'url': '',
-      'md5sum': 'bba73c19eb1f717a1f3d99e0e4380048',
-      'size': 5849288,
+      'md5sum': '2b4bf9571ee0c78c37b115d3b9ac951e',
+      'size': 6337204,
     },
   ],
 });

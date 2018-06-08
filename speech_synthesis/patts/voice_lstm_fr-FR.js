@@ -16,8 +16,8 @@ if (!window.voices) {
 
 // Add this voice to the global voice array.
 window.voices.push({
-  'pipelineFile': '/voice_lstm_fr-FR/lstm/pipeline',
-  'prefix': '',
+  'pipelineFile': '/voice_lstm_fr-FR/vlf/pipeline',
+  'prefix': '/voice_lstm_fr-FR/vlf/',
   'voiceType': 'lstm',
   'cacheToDisk': false,
   'lang': 'fr-FR',
@@ -27,8 +27,8 @@ window.voices.push({
     {
       'path': '/voice_lstm_fr-FR.zvoice',
       'url': '',
-      'md5sum': 'a916db7de02b88513492c639fbea485e',
-      'size': 15792727,
+      'md5sum': '64eea1d5f290cd58d963fb237d81e343',
+      'size': 13037451,
     },
   ],
 });

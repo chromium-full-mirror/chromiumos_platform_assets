@@ -16,8 +16,8 @@ if (!window.voices) {
 
 // Add this voice to the global voice array.
 window.voices.push({
-  'pipelineFile': '/voice_lstm_id-ID/lstm/pipeline',
-  'prefix': '',
+  'pipelineFile': '/voice_lstm_id-ID/dfz/pipeline',
+  'prefix': '/voice_lstm_id-ID/dfz/',
   'voiceType': 'lstm',
   'cacheToDisk': false,
   'lang': 'id-ID',
@@ -27,8 +27,8 @@ window.voices.push({
     {
       'path': '/voice_lstm_id-ID.zvoice',
       'url': '',
-      'md5sum': '3c476218e8b08167e19182e35a52003e',
-      'size': 3137015,
+      'md5sum': 'ad2067e196332a624f887f8be7c70b0a',
+      'size': 3078831,
     },
   ],
 });

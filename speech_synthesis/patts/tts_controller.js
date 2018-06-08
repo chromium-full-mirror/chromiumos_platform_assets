@@ -83,7 +83,17 @@ var TtsController = function(voiceType, delegate, defaultLanguage) {
    * @private
    */
   this.MAXIMUM_CHUNK_LEN_ = 2000;
+  window.addEventListener('message', this.onMessage_.bind(this));
 };
+
+/**
+ * The lower the chunk size, the lower the latency of the audio - but
+ * Chrome's audio implementation can't always handle the smallest possible
+ * sizes on all operating systems. This value is the smallest that works
+ * well on Chrome OS.
+ * @const {number}
+ */
+TtsController.CHUNK_SIZE = 256;
 
 /**
  * Must be called before invoking onSpeak(), if the TtsController
@@ -367,9 +377,8 @@ TtsController.prototype.handleMessage = function(messageEvent) {
     this.setIdleTimeout_();
   } else if (data == 'error') {
     console.log('error');
-  } else if (data == 'idle' && !this.initialized_) {
-    this.initialized_ = true;
-    this.delegate_.onInitialized();
+  } else if (data == 'voiceLoaded') {
+    this.onInitialized_();
   } else if (data.substr(0, 8) == 'percent:') {
     this.progress_(parseInt(data.substr(8), 10));
   } else if (data.substr(0, 6) == 'event:') {
@@ -463,40 +472,8 @@ TtsController.prototype.load = function() {
   this.nativeTts_.addEventListener(
       'message', this.handleMessageCallback, false);
 
-  // The lower the chunk size, the lower the latency of the audio - but
-  // Chrome's audio implementation can't always handle the smallest possible
-  // sizes on all operating systems. This value is the smallest that works
-  // well on Chrome OS.
-  var chunkSize = 256;
-
-  var args = [this.escapePluginArg_(this.voice_.pipelineFile),
-              this.escapePluginArg_(this.voice_.prefix)];
-  this.nativeTts_.postMessage('setPipelineFileAndPrefix:' + args.join(':'));
-
-  for (var i = 0; i < this.voice_.removePaths.length; i++) {
-    var path = this.voice_.removePaths[i];
-    this.nativeTts_.postMessage('removeDataFile:' +
-                                this.escapePluginArg_(path));
-  }
-
-  for (var i = 0; i < this.voice_.files.length; i++) {
-    var dataFile = this.voice_.files[i];
-    var url = dataFile.url;
-    if (!url) {
-      url = chrome.extension.getURL(dataFile.path);
-    }
-    args = [this.escapePluginArg_(url),
-            this.escapePluginArg_(dataFile.path),
-            this.escapePluginArg_(dataFile.md5sum),
-            this.escapePluginArg_(String(dataFile.size))];
-    if (this.voice_.cacheToDisk) {
-      this.nativeTts_.postMessage('addDataFile:' + args.join(':'));
-    } else {
-      this.nativeTts_.postMessage('addMemoryFile:' + args.join(':'));
-    }
-  }
-
-  this.nativeTts_.postMessage('startService:' + chunkSize);
+  this.addVoice(this.voice_);
+  this.nativeTts_.postMessage('startService:' + TtsController.CHUNK_SIZE);
 };
 
 /**
@@ -512,6 +489,63 @@ TtsController.prototype.destroyNativeTts_ = function() {
   }
   this.nativeTts_ = null;
   this.initialized_ = false;
+};
+
+/**
+ * Adds a voice. This includes requesting its native load.
+ * @param {Object} voice The voice object from window.voices.
+ */
+TtsController.prototype.addVoice = function(voice) {
+  var args = [
+    this.escapePluginArg_(voice.pipelineFile),
+    this.escapePluginArg_(voice.prefix)
+  ];
+  this.nativeTts_.postMessage('setPipelineFileAndPrefix:' + args.join(':'));
+
+  for (var i = 0; i < voice.removePaths.length; i++) {
+    var path = voice.removePaths[i];
+    this.nativeTts_.postMessage('removeDataFile:' +
+                                this.escapePluginArg_(path));
+  }
+
+  for (var i = 0; i < voice.files.length; i++) {
+    var dataFile = voice.files[i];
+    var url = dataFile.url;
+    if (!url) {
+      url = chrome.extension.getURL(dataFile.path);
+    }
+    args = [this.escapePluginArg_(url),
+            this.escapePluginArg_(dataFile.path),
+            this.escapePluginArg_(dataFile.md5sum),
+            this.escapePluginArg_(String(dataFile.size))];
+    if (voice.cacheToDisk) {
+      this.nativeTts_.postMessage('addDataFile:' + args.join(':'));
+    } else {
+      this.nativeTts_.postMessage('addMemoryFile:' + args.join(':'));
+    }
+  }
+};
+
+/**
+ * Removes the given voice.
+ * @param {Object} voice
+ */
+TtsController.prototype.removeVoice = function(voice) {
+  if (!voice.cacheToDisk) throw 'Cannot remove built in voice.';
+
+  if (!this.rootDirectory_) return;
+
+  for (var i = 0; i < voice.files.length; i++) {
+    var dataFile = voice.files[i];
+    var file = this.rootDirectory_.find((f) => f.fullPath == dataFile.path);
+    if (!file) {
+      console.error('File not found: ' + dataFile.path);
+      continue;
+    }
+    file.remove(() => {});
+  }
+  this.rootDirectory_ = null;
+  this.onInitialized_();
 };
 
 /**
@@ -595,4 +629,92 @@ TtsController.prototype.setIdleTimeout_ = function() {
     }
     this.idleTimeout_ = null;
   }).bind(this), this.IDLE_TIMEOUT_IN_MILLISECONDS_);
+};
+
+/** @private */
+TtsController.prototype.onInitialized_ = function() {
+  // The below logic ensures we tell Chrome about only voices that are loaded
+  // (for disk cached voices).
+  window.webkitRequestFileSystem(
+      window.TEMPORARY,
+      100 * 1000 * 1000 /* size (as defined in nacl_tts_data_file_loader.cc */,
+      (fs) => {
+        var reader = fs.root.createReader();
+        reader.readEntries((results) => {
+          this.rootDirectory_ = results;
+          var unloadedVoiceNames = {};
+          window.voices.forEach((voice) => {
+            var unloaded = voice.cacheToDisk &&
+                !results.find(
+                    (result) => voice.files.find(
+                        (file) => file.path == result.fullPath));
+
+            // Cache this voice by its voiceName for faster lookup below.
+            unloadedVoiceNames[voice.voiceName] = unloaded;
+
+            // Set the load state for other uses.
+            voice.unloaded = unloaded;
+          });
+
+          // Update tts system with only loaded voices.
+          var loadedVoicesFromManifest =
+              chrome.runtime.getManifest().tts_engine.voices.filter((voice) => {
+                return !unloadedVoiceNames[voice['voice_name']];
+              });
+
+          // Manifest voice format uses snake case, but js runtime expects
+          // cammal.
+          loadedVoicesFromManifest = loadedVoicesFromManifest.map((voice) => {
+            var newVoice = {};
+            newVoice['voiceName'] = voice['voice_name'];
+            newVoice['eventTypes'] = voice['event_types'];
+            newVoice['gender'] = voice['gender'];
+            newVoice['lang'] = voice['lang'];
+            return newVoice;
+          });
+
+          chrome.ttsEngine.updateVoices(loadedVoicesFromManifest);
+          this.sendToOptions_({
+            type: 'updateVoices',
+            data: window.voices
+          });
+          this.initialized_ = true;
+          this.delegate_.onInitialized();
+        });
+      });
+};
+
+/**
+ * @param {Object} message
+ * @private
+ */
+TtsController.prototype.onMessage_ = function(message) {
+  var command = JSON.parse(message.data);
+  switch (command.type) {
+    case 'getVoices':
+      this.sendToOptions_({
+        type: 'updateVoices',
+        data: window.voices
+      });
+      break;
+    case 'addVoice':
+      this.addVoice(command.data);
+      break;
+    case 'removeVoice':
+      this.removeVoice(command.data);
+      break;
+  }
+};
+
+/**
+ * @param {Object} message
+ * @private
+ */
+TtsController.prototype.sendToOptions_ = function(message) {
+  var views = chrome.extension.getViews();
+  for (var i = 0; i < views.length; i++) {
+    if (views[i].location.href.indexOf('options.html') > 0) {
+      views[i].postMessage(JSON.stringify(message), window.location.origin);
+    }
+  }
 };

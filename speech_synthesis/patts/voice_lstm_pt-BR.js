@@ -16,8 +16,8 @@ if (!window.voices) {
 
 // Add this voice to the global voice array.
 window.voices.push({
-  'pipelineFile': '/voice_lstm_pt-BR/lstm/pipeline',
-  'prefix': '',
+  'pipelineFile': '/voice_lstm_pt-BR/afs/pipeline',
+  'prefix': '/voice_lstm_pt-BR/afs/',
   'voiceType': 'lstm',
   'cacheToDisk': false,
   'lang': 'pt-BR',
@@ -27,8 +27,8 @@ window.voices.push({
     {
       'path': '/voice_lstm_pt-BR.zvoice',
       'url': '',
-      'md5sum': '1b47cc9b4133d2a7214850828701a12a',
-      'size': 4023776,
+      'md5sum': '1c1f170f0cd564bac7782eb80160f1dc',
+      'size': 4859677,
     },
   ],
 });

@@ -16,8 +16,8 @@ if (!window.voices) {
 
 // Add this voice to the global voice array.
 window.voices.push({
-  'pipelineFile': '/voice_lstm_hi-IN/lstm/pipeline',
-  'prefix': '',
+  'pipelineFile': '/voice_lstm_hi-IN/cfn/pipeline',
+  'prefix': '/voice_lstm_hi-IN/cfn/',
   'voiceType': 'lstm',
   'cacheToDisk': false,
   'lang': 'hi-IN',
@@ -27,8 +27,8 @@ window.voices.push({
     {
       'path': '/voice_lstm_hi-IN.zvoice',
       'url': '',
-      'md5sum': '2012d5d67d610e70392cca2584ef8b43',
-      'size': 11470506,
+      'md5sum': '502c597b02b256ede2f888d82c75f828',
+      'size': 11483505,
     },
   ],
 });

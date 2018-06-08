@@ -16,8 +16,8 @@ if (!window.voices) {
 
 // Add this voice to the global voice array.
 window.voices.push({
-  'pipelineFile': '/voice_lstm_it-IT/lstm/pipeline',
-  'prefix': '',
+  'pipelineFile': '/voice_lstm_it-IT/kda/pipeline',
+  'prefix': '/voice_lstm_it-IT/kda/',
   'voiceType': 'lstm',
   'cacheToDisk': false,
   'lang': 'it-IT',
@@ -27,8 +27,8 @@ window.voices.push({
     {
       'path': '/voice_lstm_it-IT.zvoice',
       'url': '',
-      'md5sum': '9b0461525fb72ebd4acb646f4d1eea5c',
-      'size': 7839115,
+      'md5sum': 'f0469f95394df2c0658547a262ad2ac1',
+      'size': 8327420,
     },
   ],
 });

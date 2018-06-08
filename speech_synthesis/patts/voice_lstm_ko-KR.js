@@ -16,8 +16,8 @@ if (!window.voices) {
 
 // Add this voice to the global voice array.
 window.voices.push({
-  'pipelineFile': '/voice_lstm_ko-KR/lstm/pipeline',
-  'prefix': '',
+  'pipelineFile': '/voice_lstm_ko-KR/ism/pipeline',
+  'prefix': '/voice_lstm_ko-KR/ism/',
   'voiceType': 'lstm',
   'cacheToDisk': false,
   'lang': 'ko-KR',
@@ -27,8 +27,8 @@ window.voices.push({
     {
       'path': '/voice_lstm_ko-KR.zvoice',
       'url': '',
-      'md5sum': '91d48a54ad3cbf85d4312b4c4f9ba728',
-      'size': 6028447,
+      'md5sum': '43b0d50f334b2f1227d78d44432370ee',
+      'size': 6450671,
     },
   ],
 });
