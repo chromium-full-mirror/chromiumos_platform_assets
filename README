@@ -1,6 +1,0 @@
-This repository (assets.git) contains assets (images, sounds, etc.) that are
-used in both official and unofficial builds. These files are installed by the
-common-assets package.
-
-See also chromeos-assets (chromeos-assets.git, official) and chromiumos-assets
-(chromiumos-assets.git, unofficial).
