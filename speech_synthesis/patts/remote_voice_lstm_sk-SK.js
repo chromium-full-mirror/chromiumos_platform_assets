@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'sk-SK',
   'gender': 'female',
+  'displayName': 'Slovak',
   'removePaths': [],
   'files': [
     {

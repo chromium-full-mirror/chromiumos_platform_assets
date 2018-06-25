@@ -50,6 +50,7 @@ TtsMain.prototype.run = function() {
   document.addEventListener('unload', this.unload, false);
   this.getVoiceNamesFromManifest_();
   this.currentController_ = new TtsController('lstm', this, navigator.language);
+  this.currentController_.updateVoices();
   chrome.ttsEngine.onSpeak.addListener(this.onSpeak.bind(this));
   chrome.ttsEngine.onStop.addListener(this.onStop.bind(this));
 };

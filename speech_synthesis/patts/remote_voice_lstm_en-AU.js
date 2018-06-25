@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'en-AU',
   'gender': 'male',
+  'displayName': 'English (Australia)',
   'removePaths': [],
   'files': [
     {

@@ -631,8 +631,12 @@ TtsController.prototype.setIdleTimeout_ = function() {
   }).bind(this), this.IDLE_TIMEOUT_IN_MILLISECONDS_);
 };
 
-/** @private */
-TtsController.prototype.onInitialized_ = function() {
+/**
+ * Updates |window.voices| with the current on-disk state of the voice.
+ * @param {function()=} callback Optional callback once the voice data is
+ * updated.
+ */
+TtsController.prototype.updateVoices = function(callback) {
   // The below logic ensures we tell Chrome about only voices that are loaded
   // (for disk cached voices).
   window.webkitRequestFileSystem(
@@ -674,14 +678,22 @@ TtsController.prototype.onInitialized_ = function() {
           });
 
           chrome.ttsEngine.updateVoices(loadedVoicesFromManifest);
-          this.sendToOptions_({
-            type: 'updateVoices',
-            data: window.voices
-          });
-          this.initialized_ = true;
-          this.delegate_.onInitialized();
+          if (callback)
+            callback();
         });
       });
+};
+
+/** @private */
+TtsController.prototype.onInitialized_ = function() {
+  this.updateVoices(() => {
+    this.sendToOptions_({
+      type: 'updateVoices',
+      data: window.voices
+    });
+    this.initialized_ = true;
+    this.delegate_.onInitialized();
+  });
 };
 
 /**

@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': false,
   'lang': 'en-US',
   'gender': 'female',
+  'displayName': 'English (United States)',
   'removePaths': [],
   'files': [
     {

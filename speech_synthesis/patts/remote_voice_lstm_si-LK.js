@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'si-LK',
   'gender': 'female',
+  'displayName': 'Sinhala',
   'removePaths': [],
   'files': [
     {

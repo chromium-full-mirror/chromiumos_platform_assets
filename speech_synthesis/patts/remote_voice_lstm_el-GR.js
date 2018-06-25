@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'el-GR',
   'gender': 'female',
+  'displayName': 'Greek',
   'removePaths': [],
   'files': [
     {

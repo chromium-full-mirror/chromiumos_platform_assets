@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'fi-FI',
   'gender': 'female',
+  'displayName': 'Finnish',
   'removePaths': [],
   'files': [
     {

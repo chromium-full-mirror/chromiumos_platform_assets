@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': false,
   'lang': 'ko-KR',
   'gender': 'male',
+  'displayName': 'Korean',
   'removePaths': [],
   'files': [
     {

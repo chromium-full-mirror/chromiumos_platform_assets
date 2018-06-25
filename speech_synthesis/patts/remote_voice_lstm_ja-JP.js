@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'ja-JP',
   'gender': 'female',
+  'displayName': 'Japanese',
   'removePaths': [],
   'files': [
     {

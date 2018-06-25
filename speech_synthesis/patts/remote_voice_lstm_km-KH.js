@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'km-KH',
   'gender': 'female',
+  'displayName': 'Khmer',
   'removePaths': [],
   'files': [
     {

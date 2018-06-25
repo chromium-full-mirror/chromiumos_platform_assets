@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'cs-CZ',
   'gender': 'female',
+  'displayName': 'Czech',
   'removePaths': [],
   'files': [
     {

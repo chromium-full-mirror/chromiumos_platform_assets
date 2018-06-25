@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'bn-BD',
   'gender': 'male',
+  'displayName': 'Bangla',
   'removePaths': [],
   'files': [
     {

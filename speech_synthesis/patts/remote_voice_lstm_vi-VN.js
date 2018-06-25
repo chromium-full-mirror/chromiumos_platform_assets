@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'vi-VN',
   'gender': 'female',
+  'displayName': 'Vietnamese',
   'removePaths': [],
   'files': [
     {

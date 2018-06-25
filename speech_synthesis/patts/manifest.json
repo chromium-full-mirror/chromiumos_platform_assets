@@ -1,7 +1,7 @@
 {
   "name": "Chrome OS built-in text-to-speech extension",
   "manifest_version": 2, 
-  "version": "3.0.5", 
+  "version": "3.0.7", 
   "options_page": "options.html", 
   "background": {
     "scripts": [

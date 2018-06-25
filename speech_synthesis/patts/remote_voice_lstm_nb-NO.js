@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'nb-NO',
   'gender': 'female',
+  'displayName': 'Norwegian Bokm\u00E5l',
   'removePaths': [],
   'files': [
     {

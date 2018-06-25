@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'ne-NP',
   'gender': 'female',
+  'displayName': 'Nepali',
   'removePaths': [],
   'files': [
     {

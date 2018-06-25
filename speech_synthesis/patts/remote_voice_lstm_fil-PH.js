@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'fil-PH',
   'gender': 'female',
+  'displayName': 'Filipino',
   'removePaths': [],
   'files': [
     {

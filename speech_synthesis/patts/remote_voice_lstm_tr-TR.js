@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'tr-TR',
   'gender': 'female',
+  'displayName': 'Turkish',
   'removePaths': [],
   'files': [
     {

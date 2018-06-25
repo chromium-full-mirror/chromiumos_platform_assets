@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'hu-HU',
   'gender': 'female',
+  'displayName': 'Hungarian',
   'removePaths': [],
   'files': [
     {

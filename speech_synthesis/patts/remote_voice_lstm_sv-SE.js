@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'sv-SE',
   'gender': 'female',
+  'displayName': 'Swedish',
   'removePaths': [],
   'files': [
     {

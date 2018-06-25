@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': false,
   'lang': 'es-ES',
   'gender': 'female',
+  'displayName': 'Spanish (Spain)',
   'removePaths': [],
   'files': [
     {

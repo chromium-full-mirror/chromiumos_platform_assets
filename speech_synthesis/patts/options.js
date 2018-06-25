@@ -39,6 +39,10 @@ OptionsPage.prototype.sendToBackground_ = function(message) {
  * @private
  */
 OptionsPage.prototype.updateVoices_ = function(voices) {
+  voices.sort((v1, v2) => {
+    return v1.displayName.localeCompare(v2.displayName);
+  });
+
   var voiceContainer = document.getElementById('voiceContainer');
   voiceContainer.innerHTML = '';
 
@@ -49,17 +53,41 @@ OptionsPage.prototype.updateVoices_ = function(voices) {
     voiceList.appendChild(voiceItem);
     voiceItem.className = 'option';
 
-    var voiceText = document.createElement('span');
-    voiceItem.appendChild(voiceText);
+    var aboutVoice = document.createElement('div');
+    voiceItem.appendChild(aboutVoice);
+    aboutVoice.className = 'about';
+
+    var voiceText = document.createElement('div');
+    aboutVoice.appendChild(voiceText);
     voiceText.id = voice.pipelineFile;
     voiceText.textContent = voice.voiceName;
+
+    var voiceDescription = null;
+    if (voice.displayName) {
+      voiceDescription = document.createElement('div');
+      aboutVoice.appendChild(voiceDescription);
+      voiceDescription.id = 'desc-' + voice.pipelineFile;
+      voiceDescription.textContent = voice.displayName;
+      voiceDescription.className = 'description';
+      voiceText.className = 'name';
+    } else {
+      voiceText.className = 'nameOnly';
+    }
+
+    // Override the DOM ordering only for accessibility by using aria-owns.
+    var ariaOwnsValue = [];
+    if (voiceDescription)
+    ariaOwnsValue.push(voiceDescription.id);
+    ariaOwnsValue.push(voiceText.id);
+    aboutVoice.setAttribute('aria-owns', ariaOwnsValue.join(' '));
 
     var actionButton = document.createElement('button');
     voiceItem.appendChild(actionButton);
     // TODO: get i18n working.
     actionButton.textContent = voice.cacheToDisk ?
         (voice.unloaded ? 'Install' : 'Uninstall') : 'Built in';
-    actionButton.setAttribute('aria-describedby', voiceText.id);
+    actionButton.setAttribute('aria-describedby',
+        voiceDescription ? voiceDescription.id : voiceText.id);
     actionButton.disabled = !voice.cacheToDisk;
     actionButton.addEventListener('click', (evt) => {
       actionButton.disabled = true;

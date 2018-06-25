@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'th-TH',
   'gender': 'female',
+  'displayName': 'Thai',
   'removePaths': [],
   'files': [
     {

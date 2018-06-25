@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'zh-TW',
   'gender': 'female',
+  'displayName': 'Chinese (Taiwan)',
   'removePaths': [],
   'files': [
     {
