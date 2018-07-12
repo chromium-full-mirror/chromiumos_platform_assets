@@ -58,24 +58,18 @@ h1 {
 
 .about {
     align-self: flex-start;
-    display: flex;
-    flex-direction: column;
     flex: auto;
 }
 
 .name {
-    align-self: flex-start;
-    line-height: 2em;
+    display: inline;
+    float: left;
 }
 
 .description {
     color: rgb(117, 117, 117);
-    line-height: 2em;
-}
-
-.nameOnly {
-    align-self: flex-start;
-    line-height: 4em;
+    display: inline;
+    margin-left: 12px;
 }
 
 .option button {

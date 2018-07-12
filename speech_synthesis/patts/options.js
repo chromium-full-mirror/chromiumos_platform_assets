@@ -61,6 +61,7 @@ OptionsPage.prototype.updateVoices_ = function(voices) {
     aboutVoice.appendChild(voiceText);
     voiceText.id = voice.pipelineFile;
     voiceText.textContent = voice.voiceName;
+    voiceText.className = 'name';
 
     var voiceDescription = null;
     if (voice.displayName) {
@@ -69,9 +70,6 @@ OptionsPage.prototype.updateVoices_ = function(voices) {
       voiceDescription.id = 'desc-' + voice.pipelineFile;
       voiceDescription.textContent = voice.displayName;
       voiceDescription.className = 'description';
-      voiceText.className = 'name';
-    } else {
-      voiceText.className = 'nameOnly';
     }
 
     // Override the DOM ordering only for accessibility by using aria-owns.
