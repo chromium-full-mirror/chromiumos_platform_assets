@@ -3,8 +3,23 @@
   <link rel="stylesheet" type="text/css" href="options.css" />
 </head>
 <body>
-  <script src="options.js"></script>
   <h1>Google TTS Settings</h1>
-  <div id="voiceContainer" class="container">
+  <div class="container">
+    <div id="searchContainer" class="searchContainer">
+      <img id="searchIcon"
+           src="baseline-search-24px.svg" aria-hidden="true"/>
+      <input id="searchInput" type="search"
+             placeholder="Search voices" aria-label="Search voices">
+      </input>
+      <button id="clearButton" aria-label="Clear"
+              style="display: none">
+      </button>
+    </div>
+    <div id="errorMessage" style="display: none">
+    </div>
+    <div id="voiceContainer"></div>
   </div>
+  <div id="searchSummary" class="hidden" aria-live="polite"
+       aria-atomic="true"></div>
+  <script src="options.js"></script>
 </body>

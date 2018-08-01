@@ -16,6 +16,7 @@ body {
 
 ul {
     padding: 0px;
+    margin: 0px;
 }
 
 h1 {
@@ -30,6 +31,24 @@ h1 {
     width: 100%;
 }
 
+.searchContainer {
+    font-size: 10pt;
+    min-height: 40px;
+    vertical-align: middle;
+    float: right;
+    position: relative;
+}
+
+.hidden {
+    display: inline-block;
+    position: fixed;
+    overflow: hidden;
+    width: 0px;
+    height: 0px;
+    top: 0px;
+    left: 0px;
+}
+
 .container {
     background-color: #fff;
     box-shadow: 5px 5px 5px -5px #aaa, -5px 5px 5px -5px #aaa;
@@ -37,6 +56,60 @@ h1 {
     margin-right: auto;
     padding: 20px 40px 0 40px;
     width: 646px;
+}
+
+#errorMessage {
+    font-size: 10pt;
+    line-height: 60px;
+    min-height: 60px;
+    vertical-align: middle;
+}
+
+input[type="search"] {
+    padding-bottom: 6px;
+    padding-right: 24px;
+    margin-right: 0px;
+    background: #fff;
+    border-width: 1px;
+    border-color: #000;
+    border-style: none none solid none;
+    outline-style: none;
+    transition : border-color 200ms ease-out, border-width 200ms ease-out;
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+}
+
+input[type="search"]:focus {
+    border-width: 2px;
+    border-color: rgb(55, 103, 213);
+    border-style: none none solid none;
+    transition : border-color 200ms ease-in, border-width 200ms ease-in;
+}
+
+.searchContainer button {
+    padding-bottom: 6px;
+    position:absolute;
+    right: 0px;
+    top: 0px;
+    width: 18px;
+    height: 18px;
+    background-size: 18px 18px;
+    background-repeat: no-repeat;
+    background-image: url("baseline-cancel-24px.svg");
+    background-color: #fff;
+    border: none;
+}
+
+.searchContainer button:hover {
+    cursor: pointer;
+}
+
+.searchContainer img {
+    width: 18px;
+    height: 18px;
+    margin-bottom: -6px;
 }
 
 .option {
