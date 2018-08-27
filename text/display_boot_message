@@ -22,6 +22,8 @@
 : ${SPINNER_IMAGE_BASE:=/usr/share/chromeos-assets/images/spinner/48x48}
 : ${SPINNER_INTERVAL:=100}
 : ${PROGRESS_BAR_RGB:=d0d0d0}
+: ${DISPLAY_INDICATOR_FILE:=/run/boot_message_displayed}
+: ${LOGGER_TAG:=display_boot_message}
 
 isatty() {
   local path="$1"
@@ -126,6 +128,8 @@ render_images() {
   # TODO(hungte) Figure out a way to render using OSC in frecon if there is
   # already a frecon instance running.
   # Stop any running frecon instance.
+  logger -t "${LOGGER_TAG}" "Kill frecon and display message: ${message}"
+  touch "${DISPLAY_INDICATOR_FILE}"
   pkill -9 frecon || true
 
   # By default frecon would exit after all images are displayed unless there
@@ -274,10 +278,32 @@ update_progress() {
     "${PROGRESS_BAR_RGB}" "${progress_offset}" "${bar_offset_y}"
 }
 
+action() {
+  local action="$1"
+  case "${action}" in
+    # Restores frecon when the boot message should be cleared.
+    restore_frecon)
+      if [ -f "${DISPLAY_INDICATOR_FILE}" ]; then
+        logger -t "${LOGGER_TAG}" "Kill and restore frecon."
+        rm "${DISPLAY_INDICATOR_FILE}"
+        pkill -9 frecon || true
+        if is_developer_end_user; then
+          # Restore frecon with the same arguments as boot-splash.conf
+          frecon --daemon --enable-osc --enable-vts --pre-create-vts
+        fi
+      fi
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 usage() {
   cat <<EOL >&2
 Usage: $0 [MESSAGE LOCALES | show_file FILE | show_spinner FILE |
-           update_progress PERCENTAGE]"
+           update_progress PERCENTAGE |
+           action [clear_indicator | restore_frecon] ]"
 EOL
   exit 1
 }
@@ -291,6 +317,9 @@ main() {
       ;;
     update_progress)
       update_progress "$2"
+      ;;
+    action)
+      action "$2"
       ;;
     *)
       show_message "$1" "$2"
