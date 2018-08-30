@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'fi-FI',
-  'gender': 'female',
   'displayName': 'Finnish',
   'removePaths': [],
   'files': [

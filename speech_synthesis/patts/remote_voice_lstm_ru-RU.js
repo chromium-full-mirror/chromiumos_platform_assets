@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'ru-RU',
-  'gender': 'female',
   'displayName': 'Russian',
   'removePaths': [],
   'files': [

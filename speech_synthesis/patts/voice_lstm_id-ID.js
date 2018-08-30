@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': false,
   'lang': 'id-ID',
-  'gender': 'female',
   'displayName': 'Indonesian',
   'removePaths': [],
   'files': [

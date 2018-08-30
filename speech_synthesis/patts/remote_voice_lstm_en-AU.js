@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'en-AU',
-  'gender': 'male',
   'displayName': 'English (Australia)',
   'removePaths': [],
   'files': [

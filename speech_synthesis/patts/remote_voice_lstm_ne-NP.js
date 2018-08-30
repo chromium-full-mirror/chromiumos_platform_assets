@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'ne-NP',
-  'gender': 'female',
   'displayName': 'Nepali',
   'removePaths': [],
   'files': [

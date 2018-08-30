@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'vi-VN',
-  'gender': 'female',
   'displayName': 'Vietnamese',
   'removePaths': [],
   'files': [

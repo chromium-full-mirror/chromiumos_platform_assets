@@ -58,18 +58,18 @@ TtsMain.prototype.run = function() {
 /**
  * Gets the voice list from the extension manifest and updates
  * window.voices accordingly.
- * Matching is done by language plus gender.
+ * Matching is done by language.
  *
  * @private
  */
 TtsMain.prototype.getVoiceNamesFromManifest_ = function() {
   var manifestVoices = chrome.runtime.getManifest().tts_engine.voices;
-  var langGenderMap = {};
+  var langMap = {};
   for (var i = 0, voice; voice = manifestVoices[i]; i++) {
-    langGenderMap[voice.lang + '-' + voice.gender] = voice.voice_name;
+    langMap[voice.lang] = voice.voice_name;
   }
   for (var i = 0, voice; voice = window.voices[i]; i++) {
-    voice.voiceName = langGenderMap[voice.lang + '-' + voice.gender];
+    voice.voiceName = langMap[voice.lang];
   }
 };
 
@@ -133,8 +133,7 @@ TtsMain.prototype.onStop = function() {
 TtsMain.prototype.onSpeak = function(utterance, options, callback) {
   console.log('Will speak: "' + utterance + '" lang="' + options.lang + '"');
 
-  this.currentController_.switchVoiceIfNeeded(
-      options.voiceName, options.lang, options.gender);
+  this.currentController_.switchVoiceIfNeeded(options.voiceName, options.lang);
   if (!this.currentController_.isInitialized()) {
     this.currentController_.ensureInitialized();
     console.log('No text-to-speech controller is initialized yet.');

@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'da-DK',
-  'gender': 'female',
   'displayName': 'Danish',
   'removePaths': [],
   'files': [

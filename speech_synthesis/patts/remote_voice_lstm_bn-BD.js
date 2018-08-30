@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'bn-BD',
-  'gender': 'male',
   'displayName': 'Bangla',
   'removePaths': [],
   'files': [

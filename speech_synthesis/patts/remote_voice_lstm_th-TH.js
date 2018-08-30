@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'th-TH',
-  'gender': 'female',
   'displayName': 'Thai',
   'removePaths': [],
   'files': [

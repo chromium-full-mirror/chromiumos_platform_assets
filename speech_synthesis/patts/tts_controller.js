@@ -249,14 +249,12 @@ TtsController.prototype.getNextChunk_ = function() {
  *
  * @param {string} preferredVoiceName The exact name of the voice to switch to.
  * @param {string} preferredLang The language to switch to.
- * @param {string} preferredGender The gender to switch to.
  * @return {boolean} true if we switched to another voice.
  */
 TtsController.prototype.switchVoiceIfNeeded = function(
-    preferredVoiceName, preferredLang, preferredGender) {
+    preferredVoiceName, preferredLang) {
   console.log('switchVoiceIfNeeded called.');
-  var voice = this.pickVoiceForParams_(preferredVoiceName, preferredLang,
-                                       preferredGender);
+  var voice = this.pickVoiceForParams_(preferredVoiceName, preferredLang);
   if (voice && voice.voiceName != this.voiceName_) {
     console.log('Switching to voice: ' + voice.voiceName);
     this.destroyNativeTts_();
@@ -274,11 +272,10 @@ TtsController.prototype.switchVoiceIfNeeded = function(
  * @private
  * @param {string} preferredVoiceName The exact name of the voice to find.
  * @param {string} preferredLang The language of the voice to find.
- * @param {string} preferredGender The gender of the voice to find.
  * @return {Voice} The voice we found.
  */
 TtsController.prototype.pickVoiceForParams_ = function(
-    preferredVoiceName, preferredLang, preferredGender) {
+    preferredVoiceName, preferredLang) {
   if (preferredVoiceName) {
     for (var i = 0; i < window.voices.length; i++) {
       if (this.voiceType_ && window.voices[i].voiceType != this.voiceType_) {
@@ -290,25 +287,21 @@ TtsController.prototype.pickVoiceForParams_ = function(
     }
   }
 
-  return this.findBestMatchingVoice_(preferredLang, preferredGender);
+  return this.findBestMatchingVoice_(preferredLang);
 };
 
 /**
- * Searches defined voices for the best match for the given language & gender.
+ * Searches defined voices for the best match for the given language.
  * Will always return a voice if at least one voice is defined for the voiceType
  * defined on creation of this object (hmm or usel).
  *
  * @private
  * @param {string} preferredLang The language to search for in BCP-47 format,
  *      capitalized as BCP-47 recommends, e.g. 'en-US'.  Case sensitive.
- * @param {string} preferredGender The gender we prefer, male or female. It
- *      can also be empty, in which case we don't filter based on gender.
  * @return {Voice} The voice that best matches the parameters.
  */
-TtsController.prototype.findBestMatchingVoice_ = function(preferredLang,
-                                                          preferredGender) {
+TtsController.prototype.findBestMatchingVoice_ = function(preferredLang) {
   var SCORE_DEFAULT_LANGUAGE = 2;  // use only to break ties.
-  var SCORE_GENDER_MATCH = 5;
   var SCORE_LANGUAGE_ONLY_MATCH = 10;  // speak 'xx-ZZ' matching 'xx-YY'
   var SCORE_LANGUAGE_PREFIX_MATCH = 20;  // speak 'xx' matching 'xx-YY'
   var SCORE_LANGUAGE_EXACT_MATCH = 30;  // speak 'xx-YY' matching 'xx-YY'
@@ -324,9 +317,6 @@ TtsController.prototype.findBestMatchingVoice_ = function(preferredLang,
     }
 
     var score = 0;
-    if (preferredGender && preferredGender == voice.gender) {
-      score += SCORE_GENDER_MATCH;
-    }
     if (preferredLang) {
       if (voice.lang == preferredLang) {
         score += SCORE_LANGUAGE_EXACT_MATCH;
@@ -672,7 +662,6 @@ TtsController.prototype.updateVoices = function(callback) {
             var newVoice = {};
             newVoice['voiceName'] = voice['voice_name'];
             newVoice['eventTypes'] = voice['event_types'];
-            newVoice['gender'] = voice['gender'];
             newVoice['lang'] = voice['lang'];
             return newVoice;
           });

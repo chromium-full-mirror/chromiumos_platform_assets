@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'tr-TR',
-  'gender': 'female',
   'displayName': 'Turkish',
   'removePaths': [],
   'files': [

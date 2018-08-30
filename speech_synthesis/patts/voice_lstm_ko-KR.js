@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': false,
   'lang': 'ko-KR',
-  'gender': 'male',
   'displayName': 'Korean',
   'removePaths': [],
   'files': [

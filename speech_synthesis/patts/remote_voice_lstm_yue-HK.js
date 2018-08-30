@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'yue-HK',
-  'gender': 'female',
   'displayName': 'Cantonese',
   'removePaths': [],
   'files': [

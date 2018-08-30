@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'hu-HU',
-  'gender': 'female',
   'displayName': 'Hungarian',
   'removePaths': [],
   'files': [

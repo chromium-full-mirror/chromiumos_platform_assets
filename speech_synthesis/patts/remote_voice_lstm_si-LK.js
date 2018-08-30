@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'si-LK',
-  'gender': 'female',
   'displayName': 'Sinhala',
   'removePaths': [],
   'files': [

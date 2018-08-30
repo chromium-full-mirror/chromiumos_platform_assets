@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'zh-TW',
-  'gender': 'female',
   'displayName': 'Chinese (Taiwan)',
   'removePaths': [],
   'files': [

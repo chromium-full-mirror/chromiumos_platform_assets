@@ -21,7 +21,6 @@ window.voices.push({
   'voiceType': 'lstm',
   'cacheToDisk': true,
   'lang': 'km-KH',
-  'gender': 'female',
   'displayName': 'Khmer',
   'removePaths': [],
   'files': [
