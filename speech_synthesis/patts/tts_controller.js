@@ -131,8 +131,7 @@ TtsController.prototype.ensureInitialized = function() {
  * @private
  */
 TtsController.prototype.getDefaultVoice_ = function() {
-  this.voice_ = this.findBestMatchingVoice_(this.defaultLanguage_,
-      '');
+  this.voice_ = this.findBestMatchingVoice_(this.defaultLanguage_);
   if (this.voice_) {
     this.voiceName_ = this.voice_.voiceName;
   }
@@ -699,9 +698,11 @@ TtsController.prototype.onMessage_ = function(message) {
       });
       break;
     case 'addVoice':
+      this.ensureInitialized();
       this.addVoice(command.data);
       break;
     case 'removeVoice':
+      this.ensureInitialized();
       this.removeVoice(command.data);
       break;
   }
