@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': false,
   'lang': 'ko-KR',
   'displayName': 'Korean',
+  'voiceName': 'Chrome OS 한국의',
   'removePaths': [],
   'files': [
     {

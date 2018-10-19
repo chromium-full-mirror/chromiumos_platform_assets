@@ -48,29 +48,10 @@ var TtsMain = function() {
  */
 TtsMain.prototype.run = function() {
   document.addEventListener('unload', this.unload, false);
-  this.getVoiceNamesFromManifest_();
   this.currentController_ = new TtsController('lstm', this, navigator.language);
   this.currentController_.updateVoices();
   chrome.ttsEngine.onSpeak.addListener(this.onSpeak.bind(this));
   chrome.ttsEngine.onStop.addListener(this.onStop.bind(this));
-};
-
-/**
- * Gets the voice list from the extension manifest and updates
- * window.voices accordingly.
- * Matching is done by language.
- *
- * @private
- */
-TtsMain.prototype.getVoiceNamesFromManifest_ = function() {
-  var manifestVoices = chrome.runtime.getManifest().tts_engine.voices;
-  var langMap = {};
-  for (var i = 0, voice; voice = manifestVoices[i]; i++) {
-    langMap[voice.lang] = voice.voice_name;
-  }
-  for (var i = 0, voice; voice = window.voices[i]; i++) {
-    voice.voiceName = langMap[voice.lang];
-  }
 };
 
 /**

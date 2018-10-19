@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'sv-SE',
   'displayName': 'Swedish',
+  'voiceName': 'Chrome OS Svenska',
   'removePaths': [],
   'files': [
     {

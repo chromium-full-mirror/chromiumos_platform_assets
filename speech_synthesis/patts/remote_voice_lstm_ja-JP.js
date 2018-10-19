@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'ja-JP',
   'displayName': 'Japanese',
+  'voiceName': 'Chrome OS 日本語',
   'removePaths': [],
   'files': [
     {

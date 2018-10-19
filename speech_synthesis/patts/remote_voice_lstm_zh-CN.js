@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'zh-CN',
   'displayName': 'Chinese (China)',
+  'voiceName': 'Chrome OS 普通话',
   'removePaths': [],
   'files': [
     {

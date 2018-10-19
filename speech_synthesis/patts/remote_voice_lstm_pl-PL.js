@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'pl-PL',
   'displayName': 'Polish',
+  'voiceName': 'Chrome OS Polski',
   'removePaths': [],
   'files': [
     {

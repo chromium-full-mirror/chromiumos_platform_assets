@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'si-LK',
   'displayName': 'Sinhala',
+  'voiceName': 'Chrome OS සිංහල',
   'removePaths': [],
   'files': [
     {

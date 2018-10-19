@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'fi-FI',
   'displayName': 'Finnish',
+  'voiceName': 'Chrome OS Suomi',
   'removePaths': [],
   'files': [
     {

@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'en-IN',
   'displayName': 'English (India)',
+  'voiceName': 'Chrome OS Indian English',
   'removePaths': [],
   'files': [
     {

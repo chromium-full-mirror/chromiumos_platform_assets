@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'en-AU',
   'displayName': 'English (Australia)',
+  'voiceName': 'Chrome OS Australian English',
   'removePaths': [],
   'files': [
     {

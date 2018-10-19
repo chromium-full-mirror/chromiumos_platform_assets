@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': false,
   'lang': 'nl-NL',
   'displayName': 'Dutch',
+  'voiceName': 'Chrome OS Nederlands',
   'removePaths': [],
   'files': [
     {

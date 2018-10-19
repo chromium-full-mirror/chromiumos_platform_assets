@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'el-GR',
   'displayName': 'Greek',
+  'voiceName': 'Chrome OS Ελληνικά',
   'removePaths': [],
   'files': [
     {

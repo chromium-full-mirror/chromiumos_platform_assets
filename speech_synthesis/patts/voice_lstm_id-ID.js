@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': false,
   'lang': 'id-ID',
   'displayName': 'Indonesian',
+  'voiceName': 'Chrome OS हिन्दी',
   'removePaths': [],
   'files': [
     {

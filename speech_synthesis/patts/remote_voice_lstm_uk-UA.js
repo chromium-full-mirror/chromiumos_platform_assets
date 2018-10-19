@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'uk-UA',
   'displayName': 'Ukrainian',
+  'voiceName': 'Chrome OS українська',
   'removePaths': [],
   'files': [
     {

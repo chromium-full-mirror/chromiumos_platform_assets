@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'vi-VN',
   'displayName': 'Vietnamese',
+  'voiceName': 'Chrome OS Tiếng Việt',
   'removePaths': [],
   'files': [
     {

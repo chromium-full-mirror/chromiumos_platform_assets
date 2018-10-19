@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'en-GB',
   'displayName': 'English (Great Britain)',
+  'voiceName': 'Chrome OS UK English',
   'removePaths': [],
   'files': [
     {

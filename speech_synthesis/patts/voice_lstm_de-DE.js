@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': false,
   'lang': 'de-DE',
   'displayName': 'German',
+  'voiceName': 'Chrome OS Deutsch',
   'removePaths': [],
   'files': [
     {

@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'ru-RU',
   'displayName': 'Russian',
+  'voiceName': 'Chrome OS русский',
   'removePaths': [],
   'files': [
     {

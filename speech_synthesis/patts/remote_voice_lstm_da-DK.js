@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'da-DK',
   'displayName': 'Danish',
+  'voiceName': 'Chrome OS Dansk',
   'removePaths': [],
   'files': [
     {

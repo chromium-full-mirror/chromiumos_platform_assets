@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'fil-PH',
   'displayName': 'Filipino',
+  'voiceName': 'Chrome OS Filipino',
   'removePaths': [],
   'files': [
     {

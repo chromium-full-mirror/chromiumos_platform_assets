@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'yue-HK',
   'displayName': 'Cantonese',
+  'voiceName': 'Chrome OS 粵語',
   'removePaths': [],
   'files': [
     {

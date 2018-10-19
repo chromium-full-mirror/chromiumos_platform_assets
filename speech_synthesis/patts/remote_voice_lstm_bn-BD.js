@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'bn-BD',
   'displayName': 'Bangla',
+  'voiceName': 'Chrome OS বাংলা',
   'removePaths': [],
   'files': [
     {

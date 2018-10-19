@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'sk-SK',
   'displayName': 'Slovak',
+  'voiceName': 'Chrome OS Slovenčina',
   'removePaths': [],
   'files': [
     {

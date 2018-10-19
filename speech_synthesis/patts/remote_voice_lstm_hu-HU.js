@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'hu-HU',
   'displayName': 'Hungarian',
+  'voiceName': 'Chrome OS Magyar',
   'removePaths': [],
   'files': [
     {

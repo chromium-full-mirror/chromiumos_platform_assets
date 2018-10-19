@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'th-TH',
   'displayName': 'Thai',
+  'voiceName': 'Chrome OS ไทย',
   'removePaths': [],
   'files': [
     {

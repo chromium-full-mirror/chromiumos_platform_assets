@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'ne-NP',
   'displayName': 'Nepali',
+  'voiceName': 'Chrome OS नेपाली',
   'removePaths': [],
   'files': [
     {

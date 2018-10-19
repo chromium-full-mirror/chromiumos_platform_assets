@@ -635,37 +635,30 @@ TtsController.prototype.updateVoices = function(callback) {
         var reader = fs.root.createReader();
         reader.readEntries((results) => {
           this.rootDirectory_ = results;
-          var unloadedVoiceNames = {};
+          var loadedVoices = [];
           window.voices.forEach((voice) => {
             var unloaded = voice.cacheToDisk &&
                 !results.find(
                     (result) => voice.files.find(
                         (file) => file.path == result.fullPath));
 
-            // Cache this voice by its voiceName for faster lookup below.
-            unloadedVoiceNames[voice.voiceName] = unloaded;
-
             // Set the load state for other uses.
             voice.unloaded = unloaded;
+            if (!unloaded)
+              loadedVoices.push(voice);
           });
 
           // Update tts system with only loaded voices.
-          var loadedVoicesFromManifest =
-              chrome.runtime.getManifest().tts_engine.voices.filter((voice) => {
-                return !unloadedVoiceNames[voice['voice_name']];
-              });
-
-          // Manifest voice format uses snake case, but js runtime expects
-          // cammal.
-          loadedVoicesFromManifest = loadedVoicesFromManifest.map((voice) => {
+          var protoVoice = chrome.runtime.getManifest().tts_engine.voices[0];
+          loadedVoices = loadedVoices.map((voice) => {
             var newVoice = {};
-            newVoice['voiceName'] = voice['voice_name'];
-            newVoice['eventTypes'] = voice['event_types'];
-            newVoice['lang'] = voice['lang'];
+            newVoice['voiceName'] = voice.voiceName;
+            newVoice['eventTypes'] = protoVoice['event_types'];
+            newVoice['lang'] = voice.lang;
             return newVoice;
           });
 
-          chrome.ttsEngine.updateVoices(loadedVoicesFromManifest);
+          chrome.ttsEngine.updateVoices(loadedVoices);
           if (callback)
             callback();
         });

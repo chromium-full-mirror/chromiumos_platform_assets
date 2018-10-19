@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'km-KH',
   'displayName': 'Khmer',
+  'voiceName': 'Chrome OS ខ្មែរ',
   'removePaths': [],
   'files': [
     {

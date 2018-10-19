@@ -22,6 +22,7 @@ window.voices.push({
   'cacheToDisk': true,
   'lang': 'nb-NO',
   'displayName': 'Norwegian Bokm\u00E5l',
+  'voiceName': 'Chrome OS Norsk Bokmål',
   'removePaths': [],
   'files': [
     {
