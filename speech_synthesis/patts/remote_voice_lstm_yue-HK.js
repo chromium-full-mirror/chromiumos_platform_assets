@@ -27,9 +27,9 @@ window.voices.push({
   'files': [
     {
       'path': '/remote_voice_lstm_yue-HK.zvoice',
-      'url': 'https://redirector.gvt1.com/edgedl/android/tts/v16/yue-hk-r2.zvoice',
-      'md5sum': '55bc48115f7d2ec2a55f84165223073d',
-      'size': 3637801,
+      'url': 'https://redirector.gvt1.com/edgedl/android/tts/v16/yue-hk-r5.zvoice',
+      'md5sum': 'c9061c53661ec38736a3b125108a83f0',
+      'size': 3662917,
     },
   ],
 });

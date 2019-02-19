@@ -28,8 +28,8 @@ window.voices.push({
     {
       'path': '/voice_lstm_hi-IN.zvoice',
       'url': '',
-      'md5sum': '502c597b02b256ede2f888d82c75f828',
-      'size': 11483505,
+      'md5sum': 'a3617f56d18fc36d3e08c44e124acdf6',
+      'size': 11531503,
     },
   ],
 });

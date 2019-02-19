@@ -28,8 +28,8 @@ window.voices.push({
     {
       'path': '/voice_lstm_ko-KR.zvoice',
       'url': '',
-      'md5sum': '43b0d50f334b2f1227d78d44432370ee',
-      'size': 6450671,
+      'md5sum': '2d8d855cf73ce01c4aaac106e639e44b',
+      'size': 6839556,
     },
   ],
 });

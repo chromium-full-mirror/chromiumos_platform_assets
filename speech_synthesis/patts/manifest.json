@@ -113,7 +113,7 @@
   }, 
   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlKEJseIIbKFyX0BCWNYOWlPEUt1IxBvIoW1PI7DTmipbwyVr3s2EprewYdtr9hCO5Yzs5w/ai1Xnhet5PLAsMje6ZP0Kvq0tlVfaYF8oQHBPF+ifx31RBT7Cn+ZVKLq1fxrwzY063GVhW+CAr06Ar8YRFXtFoC4FHlUNDIoSb4wIDAQAB", 
   "default_locale": "en", 
-  "version": "3.0.8", 
+  "version": "3.0.9", 
   "options_page": "options.html", 
   "background": {
     "persistent": false, 

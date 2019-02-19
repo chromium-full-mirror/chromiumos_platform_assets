@@ -27,9 +27,9 @@ window.voices.push({
   'files': [
     {
       'path': '/remote_voice_lstm_hu-HU.zvoice',
-      'url': 'https://redirector.gvt1.com/edgedl/android/tts/v16/hu-hu-r2.zvoice',
-      'md5sum': '2df099790dafe5488b88fefe1fd0fb6a',
-      'size': 3589832,
+      'url': 'https://redirector.gvt1.com/edgedl/android/tts/v16/hu-hu-r5.zvoice',
+      'md5sum': 'e45d4ebdb17774362fb89eeda09ff8ac',
+      'size': 3623848,
     },
   ],
 });

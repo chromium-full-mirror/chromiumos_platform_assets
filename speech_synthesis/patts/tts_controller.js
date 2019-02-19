@@ -375,7 +375,8 @@ TtsController.prototype.handleMessage = function(messageEvent) {
     this.handleTtsEvent_(parseInt(tokens[1], 10),
                          parseFloat(tokens[2]),
                          parseInt(tokens[3], 10),
-                         parseInt(tokens[4], 10));
+                         parseInt(tokens[4], 10),
+                         parseInt(tokens[5], 10));
   }
 };
 
@@ -388,32 +389,40 @@ TtsController.prototype.handleMessage = function(messageEvent) {
  * @param {number} deltaTimeSec The time when this message will occur,
  *     in seconds. May be 0 for a 'start' message, or in the future and we
  *     need to wait to send it.
- * @param {number} charIndex The position in the input utterance this event
- *     is about.
+ * @param {number} startCharIndex The start position in the input utterance this
+ *     event is about.
+ * @param {number} endCharIndex The end position in the input utterance this
+ *     event is about.
  * @param {number} ttsEventType Token type, either TTS_TOKEN_START or
  *     TTS_TOKEN_END.
  */
-TtsController.prototype.handleTtsEvent_ = function(id, deltaTimeSec,
-                                                   charIndex, ttsEventType) {
+TtsController.prototype.handleTtsEvent_ = function(
+    id, deltaTimeSec, startCharIndex, endCharIndex, ttsEventType) {
   if (this.startTimeMillis_ === undefined) {
     // This is the first event we've received.
     this.startTimeMillis_ = new Date();
-    if (this.chunkCharOffset_ == 0)
+    if (this.chunkCharOffset_ == 0) {
       this.sendResponse_(id, 'start', 0);
+    }
   }
-  if (ttsEventType == this.TTS_TOKEN_START) {
-      // Ignore all word start events.
-      return;
+  if (ttsEventType == this.TTS_TOKEN_END) {
+    // Ignore all word end events.
+    return;
   }
-  var currentTimeMillis = (new Date() - this.startTimeMillis_);
+  let charIndex = startCharIndex + this.chunkCharOffset_;
+  // TODO(katydek): Determine if this a RTL language, in which case length
+  // should be calculated differently.
+  let length = endCharIndex >= startCharIndex ?
+      endCharIndex - startCharIndex : -1;
+  let currentTimeMillis = (new Date() - this.startTimeMillis_);
   if (currentTimeMillis > 1000 * deltaTimeSec) {
-    this.sendResponse_(id, 'word',
-                       charIndex + 1 + this.chunkCharOffset_);
+    this.sendResponse_(id, 'word', charIndex, length);
   } else {
-    var timeoutId = window.setTimeout((function() {
-      this.sendResponse_(id, 'word',
-                         charIndex + 1 + this.chunkCharOffset_);
-    }).bind(this), 1000 * deltaTimeSec - currentTimeMillis);
+    var timeoutId = window.setTimeout(
+        (function() {
+          this.sendResponse_(id, 'word', charIndex, length);
+        }).bind(this),
+        1000 * deltaTimeSec - currentTimeMillis);
     this.timeouts_.push(timeoutId);
   }
 };
@@ -425,17 +434,27 @@ TtsController.prototype.handleTtsEvent_ = function(id, deltaTimeSec,
  * @param {string} id The Identifier for the utterance this message is about.
  * @param {string} type The type of the message, like 'end', 'start', etc.
  * @param {number} charIndex Optional argument for messages related to a
- *     specific position in the input utterance (like message type 'word')
+ *     specific position in the input utterance (like message type 'word'),
+ *     representing the start of what word is currently being spoken.
+ * @param {number} length Optional argument for messages related to a
+ *     length of the part about to be spoken (like message type 'word')
  */
-TtsController.prototype.sendResponse_ = function(id, type, charIndex) {
+TtsController.prototype.sendResponse_ = function(
+    id, type, charIndex, length) {
   console.log('Doing callback ' + type + ' for ' + id);
   var response = {type: type};
   response.charIndex = charIndex ?
-                       charIndex :
-                       (type == 'end' ? this.utterance_.length : 0);
+                       charIndex : (type == 'end' ? this.utterance_.length : 0);
+  if (type == 'word') {
+    response.length = length;
+  } else if (type == 'start') {
+    response.length = this.utterance_.length;
+  } else if (type == 'end') {
+    response.length = 0;
+  }
   this.delegate_.onResponse(id, response);
-  if (type == 'end' || type == 'interrupted' ||
-      type == 'cancelled' || type == 'error') {
+  if (type == 'end' || type == 'interrupted' || type == 'cancelled' ||
+      type == 'error') {
     this.clearTimeouts_();
   }
 };
