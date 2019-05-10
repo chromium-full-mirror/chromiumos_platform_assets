@@ -1,4 +1,4 @@
 Touchpad firmware updating...
 
-Please don't touch the touchpad.
+Please do not touch the touchpad.
 This may take a few minutes.
