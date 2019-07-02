@@ -111,7 +111,8 @@ render_images() {
   local rc=0
   local message="$1"
   local file="$2"
-  local spinner_file="${SPINNER_IMAGE_BASE}*01.png"
+  local spinner_file
+  spinner_file="$(printf '%s\n' "${SPINNER_IMAGE_BASE}"*01.png | head -1)"
   local image_file
 
   # Keep a copy of file in temp folder and never delete so it won't be removed
