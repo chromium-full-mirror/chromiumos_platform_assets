@@ -12,18 +12,18 @@
 # Note pango-view and frecon uses different color code format (#rrggbb vs
 # 0xrrggbb), so we use format 'rrggbb' in IMAGE_BACKGROUND_RGB and not
 # allowing common names.
-: "${IMAGE_BACKGROUND_RGB:=fefefe}"
-: "${IMAGE_FONT_NAME:=sans-serif}"
-: "${IMAGE_FONT_SIZE:=22}"
-: "${IMAGE_MARGIN_SIZE:=5}"
-: "${IMAGE_TEXT_COLOR:=Black}"
-: "${MESSAGE_BASE_PATH:=/usr/share/chromeos-assets/text/boot_messages}"
-: "${ASSETS_IMAGE_PATH:=/usr/share/chromeos-assets/images}"
-: "${SPINNER_IMAGE_BASE:=/usr/share/chromeos-assets/images/spinner/48x48}"
-: "${SPINNER_INTERVAL:=100}"
-: "${PROGRESS_BAR_RGB:=d0d0d0}"
-: "${DISPLAY_INDICATOR_FILE:=/run/boot_message_displayed}"
-: "${LOGGER_TAG:=display_boot_message}"
+: ${IMAGE_BACKGROUND_RGB:=fefefe}
+: ${IMAGE_FONT_NAME:=sans-serif}
+: ${IMAGE_FONT_SIZE:=22}
+: ${IMAGE_MARGIN_SIZE:=5}
+: ${IMAGE_TEXT_COLOR:=Black}
+: ${MESSAGE_BASE_PATH:=/usr/share/chromeos-assets/text/boot_messages}
+: ${ASSETS_IMAGE_PATH:=/usr/share/chromeos-assets/images}
+: ${SPINNER_IMAGE_BASE:=/usr/share/chromeos-assets/images/spinner/48x48}
+: ${SPINNER_INTERVAL:=100}
+: ${PROGRESS_BAR_RGB:=d0d0d0}
+: ${DISPLAY_INDICATOR_FILE:=/run/boot_message_displayed}
+: ${LOGGER_TAG:=display_boot_message}
 
 isatty() {
   local path="$1"
@@ -50,7 +50,7 @@ txt_to_png() {
   local input="$1"
   local output="$2"
   local locale="$3"
-  shift 3
+  local option="$4"
   pango-view -q --output="${output}" \
     --dpi=72 --align=left --hinting=full \
     --margin="${IMAGE_MARGIN_SIZE}"\
@@ -58,7 +58,7 @@ txt_to_png() {
     --foreground="${IMAGE_TEXT_COLOR}" \
     --background="#${IMAGE_BACKGROUND_RGB}" \
     --language="${locale}" \
-    "$@" "${input}"
+    ${option} "${input}"
 }
 
 # Converts a message file to PNG format to fit into given size.
@@ -67,9 +67,9 @@ message_to_png() {
   local output="$2"
   local locale="$3"
   local max_size_file="$4"
-  shift 4
+  local extra_options="$5"
 
-  txt_to_png "${input}" "${output}" "${locale}" "$@"
+  txt_to_png "${input}" "${output}" "${locale}" "${extra_options}"
 
   # We prefer a "left-aligned text image on center of screen, with text
   # wrapped by margin of its background image (max_size_file)". However if a
@@ -79,13 +79,11 @@ message_to_png() {
   # that, we first create the file, compare the width, and assign --width only
   # if we need wrapping.
   if [ -f "${max_size_file}" ]; then
-    local max_width
-    local width
-
-    max_width="$(get_png_width "${max_size_file}")"
-    width="$(get_png_width "${output}")"
-    if [ "${max_width}" -gt 0 ] && [ "${width}" -gt "${max_width}" ]; then
-      txt_to_png "${input}" "${output}" "${locale}" "$@" "--width=${max_width}"
+    local max_width="$(get_png_width "${max_size_file}")"
+    local width="$(get_png_width "${output}")"
+    if [ "${max_width}" -gt 0 -a "${width}" -gt "${max_width}" ]; then
+      extra_options="${extra_options} --width=${max_width}"
+      txt_to_png "${input}" "${output}" "${locale}" "${extra_options}"
     fi
   fi
 }
@@ -111,21 +109,21 @@ render_images() {
   local rc=0
   local message="$1"
   local file="$2"
-  local spinner_file="${SPINNER_IMAGE_BASE}*01.png"
-  local image_file
+  local spiner_offset=""
+  local spinner_file="${SPINNER_IMAGE_BASE}"*01.png
 
   # Keep a copy of file in temp folder and never delete so it won't be removed
   # before the renderer (frecon running in background) is ready.
   # This is required for factory wiping that file lives on stateful partition.
   # It will be removed only when system reboots.
-  image_file="$(create_temp_output)"
+  local image_file="$(create_temp_output)"
   cp -f "${file}" "${image_file}"
 
   # Put spinner in left of centered message file, with a padding of 1/2 spinner
   # image width (offset is calculated from the default location, which puts
   # spinner in center).
   local spinner_offset_x=-"$(( $(get_png_width "${image_file}") / 2 +
-                               $(get_png_width "${spinner_file}") ))"
+                               $(get_png_width ${spinner_file}) ))"
 
   # TODO(hungte) Figure out a way to render using OSC in frecon if there is
   # already a frecon instance running.
@@ -138,29 +136,28 @@ render_images() {
   # is --loop-start or --enable-vts. Most boot-time messages need to keep the
   # display until reboot so we want to always add --enable-vts.
 
-  set -- \
-    --enable-vts \
-    --clear "0x${IMAGE_BACKGROUND_RGB}" \
+  local params="--enable-vts \
+    --clear 0x${IMAGE_BACKGROUND_RGB} \
     --frame-interval 0 \
     --scale=0 \
     --enable-vt1 \
     --no-login \
     --enable-osc \
     --pre-create-vts \
-    "${ASSETS_IMAGE_PATH}/boot_message.png" \
-    "${image_file}"
+    ${ASSETS_IMAGE_PATH}/boot_message.png \
+    ${image_file}"
 
   # Frecon requires all options specified before image files.
   if need_spinner "${message}"; then
-    set -- \
-      --loop-offset "${spinner_offset_x},0" \
-      --loop-interval "${SPINNER_INTERVAL}" \
+    params="\
+      --loop-offset ${spinner_offset_x},0 \
+      --loop-interval ${SPINNER_INTERVAL} \
       --loop-start 2 \
-      "$@" \
-      "${SPINNER_IMAGE_BASE}"*.png
+      ${params} \
+      ${SPINNER_IMAGE_BASE}*.png"
   fi
 
-  frecon --daemon "$@"
+  frecon --daemon ${params}
   # Simulate the TTY1 for text output (for example, progress bar).
   # Some legacy scripts may create a broken TTY1 so we want to delete that if
   # it is not a character device. Note the vtN in /run/frecon starts from 0.
@@ -180,16 +177,15 @@ show_text_file() {
   local message="$1"
   local locale="$2"
   local file="$3"
-  shift 3
+  local options="$4"
   local rc
-  local output
 
   # Some systems run the rendering in background (for example, frecon) and we
   # don't know when the file will be accessed; so keep the file undeleted until
   # next boot.
-  output="$(create_temp_output)"
+  local output="$(create_temp_output)"
   message_to_png "${file}" "${output}" "${locale}" \
-    "${ASSETS_IMAGE_PATH}/boot_message.png" "$@" &&
+    "${ASSETS_IMAGE_PATH}/boot_message.png" "${options}" &&
   render_images "${message}" "${output}" || rc=$?
   rm -f "${output}"
   return ${rc}
@@ -252,8 +248,7 @@ update_progress() {
   # Draw the frame. The calculations below size the bar to be half the width of
   # the maximum message width, and 20 times as wide as high. The bar should show
   # below the message, so it's offset by 5 times its height to the bottom.
-  local width
-  width="$(get_png_width "${ASSETS_IMAGE_PATH}/boot_message.png")"
+  local width="$(get_png_width "${ASSETS_IMAGE_PATH}/boot_message.png")"
   local bar_width="$(( width / 2 ))"
   local bar_height="$(( bar_width / 20 ))"
   local bar_offset_y="$(( bar_height * 5 ))"
