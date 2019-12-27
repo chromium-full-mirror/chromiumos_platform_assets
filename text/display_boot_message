@@ -95,7 +95,8 @@ need_spinner() {
   case "${message}" in
     enter_dev2 | leave_dev | self_repair | update_firmware | power_wash | \
         show_spinner | wipe | update_detachable_base_firmware | \
-        update_touchpad_firmware | update_touchscreen_firmware)
+        update_touchpad_firmware | update_touchscreen_firmware | \
+        update_firmware_slow_extra_warning)
       return 0
       ;;
     *)
