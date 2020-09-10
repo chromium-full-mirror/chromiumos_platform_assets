@@ -84,6 +84,8 @@
         file="en/update_tpm_firmware_low_battery.txt" />
       <structure type="txt" name="UPDATE_TPM_FIRMWARE_LOW_BATTERY_CHARGING"
         file="en/update_tpm_firmware_low_battery_charging.txt" />
+      <structure type="txt" name="UPDATE_FWUPD_FIRMWARE"
+        file="en/update_fwupd_firmware.txt" />
     </structures>
   </release>
 </grit>

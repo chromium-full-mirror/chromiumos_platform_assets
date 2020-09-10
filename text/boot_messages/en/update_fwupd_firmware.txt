@@ -1,0 +1,4 @@
+Updating firmware.
+
+Do not turn off or unplug any devices connected to
+your Chromebook. This may take several minutes.
