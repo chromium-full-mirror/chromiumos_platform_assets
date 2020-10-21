@@ -58,6 +58,8 @@
   </translations>
   <release seq="1">
     <structures fallback_to_english="true">
+      <structure type="txt" name="UPDATE_ARC_DATA_SNAPSHOT"
+        file="en/update_arc_data_snapshot.txt"/>
       <structure type="txt" name="ENTER_DEV1_VIRTUAL"
         file="en/enter_dev1_virtual.txt"/>
       <structure type="txt" name="ENTER_DEV2" file="en/enter_dev2.txt" />

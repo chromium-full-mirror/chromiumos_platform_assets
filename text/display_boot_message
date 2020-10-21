@@ -21,9 +21,11 @@
 : ${ASSETS_IMAGE_PATH:=/usr/share/chromeos-assets/images}
 : ${SPINNER_IMAGE_BASE:=/usr/share/chromeos-assets/images/spinner/48x48}
 : ${SPINNER_INTERVAL:=100}
+: ${PROGRESS_BAR_WIDTH:=2}
 : ${PROGRESS_BAR_RGB:=d0d0d0}
 : ${DISPLAY_INDICATOR_FILE:=/run/boot_message_displayed}
 : ${LOGGER_TAG:=display_boot_message}
+: ${MESSAGE_OPTIONS:=""}
 
 isatty() {
   local path="$1"
@@ -105,6 +107,27 @@ need_spinner() {
   esac
 }
 
+# Returns true if given message requires frecon to be restarted.
+need_frecon_restart() {
+  local message="$1"
+
+  # Restart frecon if needs spinner.
+  if need_spinner "${message}"; then
+    return 0
+  fi
+  # Restart frecon if not running.
+  if ! pgrep frecon > /dev/null or ! isatty /run/frecon/vt0; then
+    return 0
+  fi
+  # Do not restart frecon for the next messages:
+  case "${message}" in update_arc_data_snapshot)
+    return 1
+    ;;
+    *)
+    return 0
+  esac
+}
+
 # Renders given images to screen.
 render_images() {
   local rc=0
@@ -129,9 +152,7 @@ render_images() {
   # TODO(hungte) Figure out a way to render using OSC in frecon if there is
   # already a frecon instance running.
   # Stop any running frecon instance.
-  logger -t "${LOGGER_TAG}" "Kill frecon and display message: ${message}"
   touch "${DISPLAY_INDICATOR_FILE}"
-  pkill -9 frecon || true
 
   # By default frecon would exit after all images are displayed unless there
   # is --loop-start or --enable-vts. Most boot-time messages need to keep the
@@ -158,18 +179,19 @@ render_images() {
       ${SPINNER_IMAGE_BASE}*.png"
   fi
 
-  frecon --daemon ${params}
-  # Simulate the TTY1 for text output (for example, progress bar).
-  # Some legacy scripts may create a broken TTY1 so we want to delete that if
-  # it is not a character device. Note the vtN in /run/frecon starts from 0.
-  local i="" frecon_vt="/run/frecon/vt" tty=""
-  for i in 0 1 2 3; do
-    tty="/dev/tty$((i + 1))"
-    if isatty "${frecon_vt}${i}" && ! isatty "${tty}"; then
-      rm -f "${tty}"
-      ln -sf "${frecon_vt}${i}" "${tty}"
-    fi
-  done
+  if need_frecon_restart "${message}"; then
+    logger -t "${LOGGER_TAG}" "Kill frecon and display message: ${message}"
+    pkill -9 frecon
+
+    frecon --daemon ${params}
+    simulate_tty
+  else
+    logger -t "${LOGGER_TAG}" "Display message: ${message}"
+
+    update_image "${ASSETS_IMAGE_PATH}/boot_message.png"
+    update_image "${image_file}"
+  fi
+
   return ${rc}
 }
 
@@ -196,13 +218,14 @@ show_text_file() {
 show_message() {
   local message="$1"
   local locales="$2"
+  local options="${MESSAGE_OPTIONS}"
   local rc=0
   local locale file
 
   for locale in ${locales}; do
     file="${MESSAGE_BASE_PATH}/${locale}/${message}.txt"
     [ -f "${file}" ] || continue
-    show_text_file "${message}" "${locale}" "${file}" "" || rc=$?
+    show_text_file "${message}" "${locale}" "${file}" "${options}" || rc=$?
     return ${rc}
   done
   # If none of given locales have this message, return as failure.
@@ -241,6 +264,16 @@ draw_box() {
     > /run/frecon/vt0
 }
 
+# Show image using frecon image showing escape sequences.
+update_image() {
+  local image_file="$1"
+
+  isatty /run/frecon/vt0 || return 1
+
+  printf '\033]image:file=%s;color=%s;scale=0\033\\' "${image_file}" \
+    "0x${IMAGE_BACKGROUND_RGB}" > /run/frecon/vt0
+}
+
 # Updates the progress bar. This requires frecon to already be set up, e.g. by
 # previously invoking display_boot_message to show a message.
 update_progress() {
@@ -250,8 +283,8 @@ update_progress() {
   # the maximum message width, and 20 times as wide as high. The bar should show
   # below the message, so it's offset by 5 times its height to the bottom.
   local width="$(get_png_width "${ASSETS_IMAGE_PATH}/boot_message.png")"
-  local bar_width="$(( width / 2 ))"
-  local bar_height="$(( bar_width / 20 ))"
+  local bar_width="$(( width / ${PROGRESS_BAR_WIDTH} ))"
+  local bar_height="$(( width / 40 ))"
   local bar_offset_y="$(( bar_height * 5 ))"
 
   # The frame is created by a solid rectangle of the full bar dimension,
@@ -277,6 +310,20 @@ update_progress() {
   local progress_offset=-"$(( (bar_width - 8 - progress_width) / 2 ))"
   draw_box "${progress_width}" "$(( bar_height - 8 ))" \
     "${PROGRESS_BAR_RGB}" "${progress_offset}" "${bar_offset_y}"
+}
+
+# Simulate the TTY1 for text output (for example, progress bar).
+# Some legacy scripts may create a broken TTY1 so we want to delete that if
+# it is not a character device. Note the vtN in /run/frecon starts from 0.
+simulate_tty() {
+  local i="" frecon_vt="/run/frecon/vt" tty=""
+  for i in 1 2 3; do
+    tty="/dev/tty$((i + 1))"
+    if isatty "${frecon_vt}${i}" && ! isatty "${tty}"; then
+      rm -f "${tty}"
+      ln -sf "${frecon_vt}${i}" "${tty}"
+    fi
+  done
 }
 
 action() {
