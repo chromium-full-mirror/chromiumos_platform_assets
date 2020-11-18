@@ -12,11 +12,11 @@
 # Note pango-view and frecon uses different color code format (#rrggbb vs
 # 0xrrggbb), so we use format 'rrggbb' in IMAGE_BACKGROUND_RGB and not
 # allowing common names.
-: ${IMAGE_BACKGROUND_RGB:=fefefe}
+: ${IMAGE_BACKGROUND_RGB:=202124}
 : ${IMAGE_FONT_NAME:=sans-serif}
 : ${IMAGE_FONT_SIZE:=22}
 : ${IMAGE_MARGIN_SIZE:=5}
-: ${IMAGE_TEXT_COLOR:=Black}
+: ${IMAGE_TEXT_COLOR:=White}
 : ${MESSAGE_BASE_PATH:=/usr/share/chromeos-assets/text/boot_messages}
 : ${ASSETS_IMAGE_PATH:=/usr/share/chromeos-assets/images}
 : ${SPINNER_IMAGE_BASE:=/usr/share/chromeos-assets/images/spinner/48x48}
