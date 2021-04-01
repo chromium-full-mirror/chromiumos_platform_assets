@@ -116,7 +116,11 @@ need_frecon_restart() {
     return 0
   fi
   # Restart frecon if not running.
-  if ! pgrep frecon > /dev/null or ! isatty /run/frecon/vt0; then
+  if ! pgrep frecon > /dev/null; then
+    return 0
+  fi
+  # Restart frecon if /run/frecon/vt0 does not exist.
+  if ! isatty /run/frecon/vt0; then
     return 0
   fi
   # Do not restart frecon for the next messages:
