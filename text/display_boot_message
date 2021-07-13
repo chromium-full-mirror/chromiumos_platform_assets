@@ -233,6 +233,8 @@ show_message() {
     return ${rc}
   done
   # If none of given locales have this message, return as failure.
+  logger -t "${LOGGER_TAG}" \
+    "Couldn't find message ${message} in '${locales}'; not displaying anything."
   return 1
 }
 
