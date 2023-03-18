@@ -1,6 +1,0 @@
-<span font="Sans Serif Bold">
-Updating your organization’s apps
-</span>
-<span foreground="gray">
-This update from your administrator will make your organization’s apps open faster. Don’t turn off your device during this update. Press the ESC key to cancel.
-</span>
