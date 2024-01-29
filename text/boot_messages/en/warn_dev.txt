@@ -16,4 +16,4 @@
                    |_ |        |
                      \         |
                       \_______/
- Chrome OS verification is turned off.
+ ChromeOS verification is turned off.
