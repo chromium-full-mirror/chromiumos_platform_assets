@@ -1,6 +1,4 @@
-adlr@chromium.org
-jsbarnes@chromium.org
-marcheu@chromium.org
-sjg@chromium.org
-slangley@chromium.org
-wuchengli@chromium.org
+# This repo was left orphaned and is currently in search of new OWNERS.
+# OWNERS=* is not ideal, so if you think this code is best for your team
+# to own, please update this file and remove OWNERS=*.
+*
